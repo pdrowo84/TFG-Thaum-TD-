@@ -8,7 +8,7 @@ public class TowerTargeting
     {
         First,
         Last,
-        Close
+        Close,
         
     }
     public static Enemy GetTarget(TowerBehaviour CurrentTower, TargetType TargetMethod)
@@ -50,8 +50,9 @@ public class TowerTargeting
                 break;
 
             case 2: //Close
+                EnemySearchJob.CompareValue = Mathf.Infinity;
+                break;
 
-                goto case 0;
 
         }
 
@@ -131,7 +132,7 @@ public class TowerTargeting
                         break;
                     case 2: //Close
                         DistanceToEnemy = Vector3.Distance(TowerPosition, _EnemiestoCalculate[index].EnemyPosition);
-                        if (DistanceToEnemy > CompareValue)
+                        if (DistanceToEnemy < CompareValue)
                         {
                             _EnemyToIndex[0] = index;
                             CompareValue = DistanceToEnemy;

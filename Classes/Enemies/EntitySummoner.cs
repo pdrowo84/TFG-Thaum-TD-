@@ -68,8 +68,9 @@ public class EntitySummoner : MonoBehaviour
             return null;
         }
 
-        EnemiesIsGameTransform.Add(SummonedEnemy.transform);
-        EnemiesInGame.Add(SummonedEnemy);
+        if(!EnemiesInGame.Contains(SummonedEnemy)) EnemiesInGame.Add(SummonedEnemy);
+        if(!EnemiesIsGameTransform.Contains(SummonedEnemy.transform)) EnemiesIsGameTransform.Add(SummonedEnemy.transform);
+        
         SummonedEnemy.ID = EnemyID;
         return SummonedEnemy;
     }

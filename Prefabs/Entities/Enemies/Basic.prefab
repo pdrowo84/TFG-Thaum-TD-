@@ -47,7 +47,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NodeIndex: 0
-  MaxHealth: 0
+  RootPart: {fileID: 8545185801791478033}
+  DamageResistance: 0.5
+  MaxHealth: 10
   Health: 0
   Speed: 0
   ID: 0

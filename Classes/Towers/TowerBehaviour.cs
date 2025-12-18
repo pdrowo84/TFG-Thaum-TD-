@@ -11,18 +11,32 @@ public class TowerBehaviour : MonoBehaviour
     public float Damage;
     public float FireRate;
     public float Range;
-
     private float Delay;
 
+    private IDamageMethod CurrentDamageMethodClass;
 
     void Start()
     {
-       Delay = 1/ FireRate;
+        CurrentDamageMethodClass = GetComponent<IDamageMethod>();
+
+        if(CurrentDamageMethodClass == null)
+        {
+            Debug.LogError("TOWERS: No damage class attached to given tower!");
+        }
+
+        else
+        {
+            CurrentDamageMethodClass.Init(Damage, FireRate);
+        }
+
+        Delay = 1/ FireRate;
     }
 
     public void Tick()
     {
-        if(Target != null)
+        CurrentDamageMethodClass.DamageTick(Target);
+
+        if (Target != null)
         {
             TowerPivot.transform.rotation = Quaternion.LookRotation(Target.transform.position - transform.position);
         }

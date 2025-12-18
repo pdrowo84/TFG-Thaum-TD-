@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine.Jobs;
 using Unity.Jobs;
+using UnityEngine.UIElements;
 
 public class GameLoopManager : MonoBehaviour 
 {
@@ -11,6 +12,7 @@ public class GameLoopManager : MonoBehaviour
     public static Vector3[] NodePositions;
     public static float[] NodeDistances;
 
+    private static Queue<EnemyDamageData> DamageData;
     private static Queue<Enemy> EnemiesToRemove;
     private static Queue<int> EnemyIDsToSummon;
 
@@ -19,7 +21,7 @@ public class GameLoopManager : MonoBehaviour
 
     private void Start()
     {
-
+        DamageData = new Queue<EnemyDamageData>();
         TowersInGame = new List<TowerBehaviour>();
         EnemyIDsToSummon = new Queue<int>();
         EnemiesToRemove = new Queue<Enemy>();
@@ -124,7 +126,20 @@ public class GameLoopManager : MonoBehaviour
             //Apply Effects
 
             //Damage Enemies
+            if (DamageData.Count > 0)
+            {
+                for (int i = 0; i < DamageData.Count; i++)
+                {
+                   EnemyDamageData CurrentDamageData = DamageData.Dequeue();
+                    CurrentDamageData.TargetedEnemy.Health -= CurrentDamageData.TotalDamage / CurrentDamageData.Resistance;
+                
+                    if(CurrentDamageData.TargetedEnemy.Health <= 0f)
+                    {
+                        EnqueuedEnemyToRemove(CurrentDamageData.TargetedEnemy);
+                    }
 
+                }
+            } 
             //Remove Enemies
 
             if (EnemiesToRemove.Count > 0)
@@ -142,6 +157,11 @@ public class GameLoopManager : MonoBehaviour
         }
     }
 
+
+    public static void EnqueueDamageData(EnemyDamageData damageData)
+    {
+        DamageData.Enqueue(damageData);
+    }
     public static void EnqueuedEnemyIDToSummon(int ID)
     {
         EnemyIDsToSummon.Enqueue(ID);
@@ -153,6 +173,20 @@ public class GameLoopManager : MonoBehaviour
     }
 }
 
+
+public struct EnemyDamageData
+{
+    public EnemyDamageData(Enemy target, float damage, float resistance)
+    {
+        TargetedEnemy = target;
+        TotalDamage = damage;
+        Resistance = resistance;
+    }
+
+    public Enemy TargetedEnemy;
+    public float TotalDamage;
+    public float Resistance;
+}
 public struct MoveEnemyJob : IJobParallelForTransform
 {
     [NativeDisableParallelForRestriction]
