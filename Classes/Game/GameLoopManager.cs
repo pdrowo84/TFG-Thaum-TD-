@@ -5,6 +5,8 @@ using Unity.Collections;
 using UnityEngine.Jobs;
 using Unity.Jobs;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameLoopManager : MonoBehaviour 
 {
@@ -19,8 +21,12 @@ public class GameLoopManager : MonoBehaviour
     public Transform NodeParent;
     public bool LoopShouldEnd;
 
+    public UnityEngine.UI.Toggle speedToggle;
+
     private void Start()
     {
+        Debug.Log(Time.timeScale);
+
         DamageData = new Queue<EnemyDamageData>();
         TowersInGame = new List<TowerBehaviour>();
         EnemyIDsToSummon = new Queue<int>();
@@ -29,7 +35,9 @@ public class GameLoopManager : MonoBehaviour
 
         NodePositions = new Vector3[NodeParent.childCount];
 
-        for(int i = 0; i < NodePositions.Length; i++)
+        if (speedToggle != null) speedToggle.onValueChanged.AddListener(ChangeSpeed);
+
+        for (int i = 0; i < NodePositions.Length; i++)
         {
             NodePositions[i] = NodeParent.GetChild(i).position;
         }
@@ -170,6 +178,33 @@ public class GameLoopManager : MonoBehaviour
     public static void EnqueuedEnemyToRemove(Enemy EnemyToRemove)
     {
         EnemiesToRemove.Enqueue(EnemyToRemove);
+    }
+
+    public static void PauseGame()
+    {
+        Time.timeScale = 0f;
+    }
+    public static void ResumeGame()
+    {
+        Time.timeScale = 1f;
+    }  
+    
+    public static void ResetGame()
+    {
+        Time.timeScale = 1f;
+        Scene current = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(current.name);
+    }
+
+    public void ChangeSpeed(bool isFast)
+    {
+        Time.timeScale = isFast ? 2f : 1f;
+    }
+
+    public void GoToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(0);
     }
 }
 

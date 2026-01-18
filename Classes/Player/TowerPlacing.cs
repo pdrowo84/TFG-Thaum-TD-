@@ -61,6 +61,13 @@ public class TowerPlacing : MonoBehaviour
 
     public void SetTowerToPlace(GameObject tower)
     {
+        // Si ya hay una torre en previsualización, elimínala
+        if (CurrentPlacingTower != null)
+        {
+            Destroy(CurrentPlacingTower);
+            CurrentPlacingTower = null;
+        }
+        // Instancia la nueva torre
         CurrentPlacingTower = Instantiate(tower, Vector3.zero, Quaternion.identity);
     }
 
