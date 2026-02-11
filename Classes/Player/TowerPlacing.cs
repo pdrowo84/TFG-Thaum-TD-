@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class TowerPlacing : MonoBehaviour
 {
@@ -16,27 +17,34 @@ public class TowerPlacing : MonoBehaviour
     }
 
 
- void Update()
+    void Update()
     {
-        if(CurrentPlacingTower != null)
+        if (CurrentPlacingTower != null)
         {
             Ray camray = PlayerCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit HitInfo;
-            if (Physics.Raycast(camray, out HitInfo, 100f, PlacementCollideMask))
+            bool hit = Physics.Raycast(camray, out HitInfo, 100f, PlacementCollideMask);
+
+            if (hit)
             {
                 CurrentPlacingTower.transform.position = HitInfo.point;
             }
 
-            if(Input.GetKeyDown(KeyCode.Q))
+            if (Input.GetKeyDown(KeyCode.Q))
             {
                 Destroy(CurrentPlacingTower);
                 CurrentPlacingTower = null;
                 return;
             }
 
-            if (Input.GetMouseButtonDown(0) && HitInfo.collider.gameObject != null)
+            // Solo intenta colocar si el raycast ha detectado algo
+            if (Input.GetMouseButtonDown(0) && hit && HitInfo.collider != null)
             {
-                if(!HitInfo.collider.gameObject.CompareTag("NoPlace"))
+                // Evita colocar la torre si el ratón está sobre el UI
+                if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                    return;
+
+                if (!HitInfo.collider.gameObject.CompareTag("NoPlace"))
                 {
                     BoxCollider TowerCollider = CurrentPlacingTower.GetComponent<BoxCollider>();
                     TowerCollider.isTrigger = true;
@@ -49,12 +57,8 @@ public class TowerPlacing : MonoBehaviour
 
                         TowerCollider.isTrigger = false;
                         CurrentPlacingTower = null;
-                        
                     }
-                    
-
                 }
-                
             }
         }
     }

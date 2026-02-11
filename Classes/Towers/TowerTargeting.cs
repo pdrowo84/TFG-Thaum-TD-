@@ -76,6 +76,10 @@ public class TowerTargeting
         NodeDistances.Dispose();
         EnemyToIndex.Dispose();
 
+        if (EnemyIndexToReturn < 0 || EnemyIndexToReturn >= EntitySummoner.EnemiesInGame.Count)
+        {
+            return null;
+        }
         return EntitySummoner.EnemiesInGame[EnemyIndexToReturn];
 
     }

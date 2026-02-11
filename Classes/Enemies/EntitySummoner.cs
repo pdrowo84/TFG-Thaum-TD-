@@ -7,6 +7,8 @@ public class EntitySummoner : MonoBehaviour
 {
     public static List<Enemy> EnemiesInGame;
     public static List<Transform> EnemiesIsGameTransform;
+
+    public static Dictionary<Transform, Enemy> EnemyTransformPairs;
     public static Dictionary<int, GameObject> EnemyPrefabs;
     public static Dictionary<int, Queue<Enemy>> EnemyObjectPools;
 
@@ -15,7 +17,8 @@ public class EntitySummoner : MonoBehaviour
     public static void Init()
     {
         if (!IsInitialized) 
-        { 
+        {
+            EnemyTransformPairs = new Dictionary<Transform, Enemy>();
             EnemyPrefabs = new Dictionary<int, GameObject>();
             EnemyObjectPools = new Dictionary<int, Queue<Enemy>>();
             EnemiesInGame = new List<Enemy>();
@@ -70,7 +73,8 @@ public class EntitySummoner : MonoBehaviour
 
         if(!EnemiesInGame.Contains(SummonedEnemy)) EnemiesInGame.Add(SummonedEnemy);
         if(!EnemiesIsGameTransform.Contains(SummonedEnemy.transform)) EnemiesIsGameTransform.Add(SummonedEnemy.transform);
-        
+        if(!EnemyTransformPairs.ContainsKey(SummonedEnemy.transform)) EnemyTransformPairs.Add(SummonedEnemy.transform, SummonedEnemy);
+
         SummonedEnemy.ID = EnemyID;
         return SummonedEnemy;
     }
@@ -79,6 +83,7 @@ public class EntitySummoner : MonoBehaviour
     {
         EnemyObjectPools[EnemyToRemove.ID].Enqueue(EnemyToRemove);
         EnemyToRemove.gameObject.SetActive(false);
+        EnemyTransformPairs.Remove(EnemyToRemove.transform);
         EnemiesIsGameTransform.Remove(EnemyToRemove.transform);
         EnemiesInGame.Remove(EnemyToRemove);
     }

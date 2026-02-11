@@ -14,6 +14,7 @@ public class GameLoopManager : MonoBehaviour
     public static Vector3[] NodePositions;
     public static float[] NodeDistances;
 
+    private static Queue<ApplyEffectData> EffectsQueue;
     private static Queue<EnemyDamageData> DamageData;
     private static Queue<Enemy> EnemiesToRemove;
     private static Queue<int> EnemyIDsToSummon;
@@ -27,6 +28,7 @@ public class GameLoopManager : MonoBehaviour
     {
         Debug.Log(Time.timeScale);
 
+        EffectsQueue = new Queue<ApplyEffectData>();
         DamageData = new Queue<EnemyDamageData>();
         TowersInGame = new List<TowerBehaviour>();
         EnemyIDsToSummon = new Queue<int>();
@@ -132,6 +134,34 @@ public class GameLoopManager : MonoBehaviour
             }
 
             //Apply Effects
+            if (EffectsQueue.Count > 0)
+            {
+                for (int i = 0; i < EffectsQueue.Count; i++)
+                {
+                    ApplyEffectData CurrentDamageData = EffectsQueue.Dequeue();
+                    Effect EffectDuplicate = CurrentDamageData.EnemyToAffect.ActiveEffects.Find(x => x.EffectName == CurrentDamageData.EffectToApply.EffectName);
+
+                    if (EffectDuplicate == null)
+                    {
+                        CurrentDamageData.EnemyToAffect.ActiveEffects.Add(CurrentDamageData.EffectToApply);
+                        Debug.Log($"[Efecto] Añadido efecto '{CurrentDamageData.EffectToApply.EffectName}' a {CurrentDamageData.EnemyToAffect.name}");
+                    }
+                
+                    else
+                    {
+                        EffectDuplicate.ExpireTime = CurrentDamageData.EffectToApply.ExpireTime;
+                        Debug.Log($"[Efecto] Refrescada duración de '{EffectDuplicate.EffectName}' en {CurrentDamageData.EnemyToAffect.name}");
+                    }
+                
+                }
+            }
+
+            //Tick Enemies
+            foreach(Enemy CurrentEnemy in EntitySummoner.EnemiesInGame)
+            {
+                if (CurrentEnemy != null)
+                    CurrentEnemy.Tick();
+            }
 
             //Damage Enemies
             if (DamageData.Count > 0)
@@ -165,7 +195,10 @@ public class GameLoopManager : MonoBehaviour
         }
     }
 
-
+    public static void EnqueueEffectToApply(ApplyEffectData effectData)
+    {
+        EffectsQueue.Enqueue(effectData);
+    }
     public static void EnqueueDamageData(EnemyDamageData damageData)
     {
         DamageData.Enqueue(damageData);
@@ -191,6 +224,15 @@ public class GameLoopManager : MonoBehaviour
     
     public static void ResetGame()
     {
+        // Limpia pools y listas para evitar referencias a objetos destruidos
+        if (EntitySummoner.EnemiesInGame != null) EntitySummoner.EnemiesInGame.Clear();
+        if (EntitySummoner.EnemiesIsGameTransform != null) EntitySummoner.EnemiesIsGameTransform.Clear();
+        if (TowersInGame != null) TowersInGame.Clear(); // <-- Añade esto
+        if (EntitySummoner.EnemyObjectPools != null)
+        {
+            foreach (var pool in EntitySummoner.EnemyObjectPools.Values)
+                pool.Clear();
+        }
         Time.timeScale = 1f;
         Scene current = SceneManager.GetActiveScene();
         SceneManager.LoadScene(current.name);
@@ -203,12 +245,42 @@ public class GameLoopManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        Time.timeScale = 1f;
+        ResetGame();
         SceneManager.LoadScene(0);
     }
 }
 
 
+public class Effect
+{
+    public Effect(string effectName, float damageRate, float damage, float expireTime)
+    {
+        ExpireTime = expireTime;
+        EffectName = effectName;
+        DamageRate = damageRate;
+        Damage = damage;
+    }
+
+    public string EffectName;
+
+    public float Damage;
+    public float DamageRate;
+    public float DamageDelay;
+
+    public float ExpireTime;
+}
+
+public struct ApplyEffectData
+{
+    public ApplyEffectData(Enemy enemyToAffect, Effect effectToApply)
+    {
+        EnemyToAffect = enemyToAffect;
+        EffectToApply = effectToApply;
+    }
+
+    public Enemy EnemyToAffect;
+    public Effect EffectToApply;
+}
 public struct EnemyDamageData
 {
     public EnemyDamageData(Enemy target, float damage, float resistance)
