@@ -19,6 +19,8 @@ public class GameLoopManager : MonoBehaviour
     private static Queue<Enemy> EnemiesToRemove;
     private static Queue<int> EnemyIDsToSummon;
 
+    private PlayerStats PlayerStatistics;
+
     public Transform NodeParent;
     public bool LoopShouldEnd;
 
@@ -28,6 +30,7 @@ public class GameLoopManager : MonoBehaviour
     {
         Debug.Log(Time.timeScale);
 
+        PlayerStatistics = FindObjectOfType<PlayerStats>();
         EffectsQueue = new Queue<ApplyEffectData>();
         DamageData = new Queue<EnemyDamageData>();
         TowersInGame = new List<TowerBehaviour>();
@@ -170,7 +173,8 @@ public class GameLoopManager : MonoBehaviour
                 {
                    EnemyDamageData CurrentDamageData = DamageData.Dequeue();
                     CurrentDamageData.TargetedEnemy.Health -= CurrentDamageData.TotalDamage / CurrentDamageData.Resistance;
-                
+                    PlayerStatistics.AddMoney((int)CurrentDamageData.TotalDamage);
+
                     if(CurrentDamageData.TargetedEnemy.Health <= 0f)
                     {
                         EnqueuedEnemyToRemove(CurrentDamageData.TargetedEnemy);

@@ -5,7 +5,9 @@ public class TowerPlacing : MonoBehaviour
 {
     [SerializeField] private LayerMask PlacementCheckMask;
     [SerializeField] private LayerMask PlacementCollideMask;
+
     [SerializeField] private Camera PlayerCamera;
+    [SerializeField] private PlayerStats PlayerStatisctics;
 
     private GameObject CurrentPlacingTower;
 
@@ -53,7 +55,23 @@ public class TowerPlacing : MonoBehaviour
                     Vector3 HalfExtents = TowerCollider.size / 2;
                     if (!Physics.CheckBox(BoxCenter, HalfExtents, Quaternion.identity, PlacementCheckMask, QueryTriggerInteraction.Ignore))
                     {
-                        GameLoopManager.TowersInGame.Add(CurrentPlacingTower.GetComponent<TowerBehaviour>());
+                        TowerBehaviour CurrentToweBehaviour = CurrentPlacingTower.GetComponent<TowerBehaviour>();
+                        GameLoopManager.TowersInGame.Add(CurrentToweBehaviour);
+
+                        PlayerStatisctics.AddMoney(-CurrentToweBehaviour.SummonCost);
+
+                        // Reactiva el daño y los colliders de daño
+                        var flameThrower = CurrentPlacingTower.GetComponent<FlameThrowerDamage>();
+                        if (flameThrower != null)
+                        {
+                            flameThrower.enabled = true;
+                        }
+                        var colliders = CurrentPlacingTower.GetComponentsInChildren<Collider>(true);
+                        foreach (var col in colliders)
+                        {
+                            if (col.isTrigger)
+                                col.enabled = true;
+                        }
 
                         TowerCollider.isTrigger = false;
                         CurrentPlacingTower = null;
@@ -71,8 +89,32 @@ public class TowerPlacing : MonoBehaviour
             Destroy(CurrentPlacingTower);
             CurrentPlacingTower = null;
         }
-        // Instancia la nueva torre
-        CurrentPlacingTower = Instantiate(tower, Vector3.zero, Quaternion.identity);
+
+        int TowerSummonCost = tower.GetComponent<TowerBehaviour>().SummonCost;
+
+        if (PlayerStatisctics.GetMoney() >= TowerSummonCost)
+        {
+            CurrentPlacingTower = Instantiate(tower, Vector3.zero, Quaternion.identity);
+
+            // Desactiva el daño y los colliders de daño en todos los hijos
+            var flameThrower = CurrentPlacingTower.GetComponent<FlameThrowerDamage>();
+            if (flameThrower != null)
+            {
+                flameThrower.enabled = false;
+            }
+
+            // Desactiva todos los colliders en hijos que estén en modo trigger (usualmente los de daño)
+            var colliders = CurrentPlacingTower.GetComponentsInChildren<Collider>(true);
+            foreach (var col in colliders)
+            {
+                if (col.isTrigger)
+                    col.enabled = false;
+            }
+        }
+        else
+        {
+            Debug.Log("No tienes suficiente dinero para colocar esta torre.");
+        }
     }
 
 

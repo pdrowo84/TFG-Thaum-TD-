@@ -50,10 +50,13 @@ public class TowerTargeting
                 break;
 
             case 2: //Close
-                EnemySearchJob.CompareValue = Mathf.Infinity;
-                break;
+                goto case 0;
 
+            case 3: //Strong
+                goto case 1;
 
+            case 4: // Weak
+                goto case 0;
         }
 
         JobHandle dependency = new JobHandle();
@@ -140,6 +143,21 @@ public class TowerTargeting
                         {
                             _EnemyToIndex[0] = index;
                             CompareValue = DistanceToEnemy;
+                        }
+                        break;
+                    case 3: //Strong
+         
+                        if (_EnemiestoCalculate[index].Health > CompareValue)
+                        {
+                            _EnemyToIndex[0] = index;
+                            CompareValue = _EnemiestoCalculate[index].Health;
+                        }
+                        break;
+                    case 4: //Weak
+                        if (_EnemiestoCalculate[index].Health < CompareValue)
+                        {
+                            _EnemyToIndex[0] = index;
+                            CompareValue = _EnemiestoCalculate[index].Health;
                         }
                         break;
                 }

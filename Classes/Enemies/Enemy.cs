@@ -28,6 +28,8 @@ public class Enemy : MonoBehaviour
 
     public void Tick()
     {
+        if (this == null) return; // Protección extra
+
         Debug.Log($"[Efecto] {name}: {ActiveEffects.Count} efectos activos.");
 
         for (int i = 0; i < ActiveEffects.Count; i++)

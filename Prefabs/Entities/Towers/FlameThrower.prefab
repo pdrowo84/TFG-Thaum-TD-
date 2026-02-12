@@ -844,6 +844,7 @@ MonoBehaviour:
   Damage: 1
   FireRate: 1
   Range: 5
+  SummonCost: 400
 --- !u!65 &7843392817550557165
 BoxCollider:
   m_ObjectHideFlags: 0
