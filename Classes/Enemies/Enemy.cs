@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
     public float Health;
     public float Speed;
     public int ID;
+    public int LifeDamage;
 
     public void Init()
     {
@@ -22,7 +23,7 @@ public class Enemy : MonoBehaviour
         Health = MaxHealth;
         transform.position = GameLoopManager.NodePositions[0];
         NodeIndex = 0;
-        Speed = 4f;
+       
     }
 
 

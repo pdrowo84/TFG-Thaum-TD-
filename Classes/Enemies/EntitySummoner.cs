@@ -16,7 +16,7 @@ public class EntitySummoner : MonoBehaviour
 
     public static void Init()
     {
-        if (!IsInitialized) 
+        if (!IsInitialized)
         {
             EnemyTransformPairs = new Dictionary<Transform, Enemy>();
             EnemyPrefabs = new Dictionary<int, GameObject>();
@@ -28,28 +28,39 @@ public class EntitySummoner : MonoBehaviour
 
             foreach (EnemySummonData Enemy in Enemies)
             {
+                Debug.Log($"Cargando EnemyID: {Enemy.EnemyID}, Prefab: {Enemy.EnemyPrefab}");
                 EnemyPrefabs.Add(Enemy.EnemyID, Enemy.EnemyPrefab);
                 EnemyObjectPools.Add(Enemy.EnemyID, new Queue<Enemy>());
             }
 
             IsInitialized = true;
         }
-
         else
         {
             Debug.Log("ENTITY SUMMONER:  THIS CLASS IS ALREADY INITIALIZED");
         }
+
 
     }
     public static Enemy SummonEnemy (int EnemyID)
     {
         Enemy SummonedEnemy = null;
 
-        if (EnemyPrefabs.ContainsKey(EnemyID))
+        if (EnemyPrefabs[EnemyID] == null)
+        {
+            Debug.LogError($"El prefab para EnemyID {EnemyID} es NULL. Revisa el asset EnemySummonData correspondiente.");
+        }
+
+        if (!EnemyPrefabs.ContainsKey(EnemyID))
+        {
+            Debug.Log($"ENTITYSUMMONER: ENEMY WITH ID OF {EnemyID} DOES NOT EXIST!");
+            return null;
+        }
+        else
         {
             Queue<Enemy> ReferencedQueue = EnemyObjectPools[EnemyID];
 
-            if(ReferencedQueue.Count > 0)
+            if (ReferencedQueue.Count > 0)
             {
                 //Dequeue enemy and initialize 
                 SummonedEnemy = ReferencedQueue.Dequeue();
@@ -65,13 +76,8 @@ public class EntitySummoner : MonoBehaviour
                 SummonedEnemy.Init();
             }
         }
-        else
-        {
-            Debug.Log($"ENTITYSUMMONER: ENEMY WITH ID OF {EnemyID} DOES NOT EXIST!");
-            return null;
-        }
 
-        if(!EnemiesInGame.Contains(SummonedEnemy)) EnemiesInGame.Add(SummonedEnemy);
+        if (!EnemiesInGame.Contains(SummonedEnemy)) EnemiesInGame.Add(SummonedEnemy);
         if(!EnemiesIsGameTransform.Contains(SummonedEnemy.transform)) EnemiesIsGameTransform.Add(SummonedEnemy.transform);
         if(!EnemyTransformPairs.ContainsKey(SummonedEnemy.transform)) EnemyTransformPairs.Add(SummonedEnemy.transform, SummonedEnemy);
 

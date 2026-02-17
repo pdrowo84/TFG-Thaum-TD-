@@ -9,7 +9,9 @@ public class TowerTargeting
         First,
         Last,
         Close,
-        
+        Strong,
+        Weak
+
     }
     public static Enemy GetTarget(TowerBehaviour CurrentTower, TargetType TargetMethod)
     {

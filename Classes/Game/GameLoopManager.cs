@@ -28,7 +28,12 @@ public class GameLoopManager : MonoBehaviour
 
     private void Start()
     {
+        EntitySummoner.Init();
+
         Debug.Log(Time.timeScale);
+
+
+        
 
         PlayerStatistics = FindObjectOfType<PlayerStats>();
         EffectsQueue = new Queue<ApplyEffectData>();
@@ -36,9 +41,14 @@ public class GameLoopManager : MonoBehaviour
         TowersInGame = new List<TowerBehaviour>();
         EnemyIDsToSummon = new Queue<int>();
         EnemiesToRemove = new Queue<Enemy>();
-        EntitySummoner.Init();
+
+        
 
         NodePositions = new Vector3[NodeParent.childCount];
+
+        EntitySummoner.SummonEnemy(1); // basic
+        EntitySummoner.SummonEnemy(2); // second
+        EntitySummoner.SummonEnemy(3); // third
 
         if (speedToggle != null) speedToggle.onValueChanged.AddListener(ChangeSpeed);
 
@@ -54,8 +64,10 @@ public class GameLoopManager : MonoBehaviour
             NodeDistances[i] = Vector3.Distance(NodePositions[i], NodePositions[i + 1]);
         }
 
+        
         StartCoroutine(GameLoop());
         InvokeRepeating("SummonTest", 0f, 1f);
+
         
     }
 
@@ -119,6 +131,11 @@ public class GameLoopManager : MonoBehaviour
 
                 if(EntitySummoner.EnemiesInGame[i].NodeIndex >= NodePositions.Length)
                 {
+                    if (PlayerStatistics != null)
+                    {
+                        int lifeDamage = EntitySummoner.EnemiesInGame[i].LifeDamage;
+                        PlayerStatistics.LoseLife(lifeDamage);
+                    }
                     EnqueuedEnemyToRemove(EntitySummoner.EnemiesInGame[i]);
                 }
             }
@@ -171,15 +188,18 @@ public class GameLoopManager : MonoBehaviour
             {
                 for (int i = 0; i < DamageData.Count; i++)
                 {
-                   EnemyDamageData CurrentDamageData = DamageData.Dequeue();
+                    EnemyDamageData CurrentDamageData = DamageData.Dequeue();
                     CurrentDamageData.TargetedEnemy.Health -= CurrentDamageData.TotalDamage / CurrentDamageData.Resistance;
-                    PlayerStatistics.AddMoney((int)CurrentDamageData.TotalDamage);
 
-                    if(CurrentDamageData.TargetedEnemy.Health <= 0f)
+                    int moneyToAdd = (int)CurrentDamageData.TotalDamage;
+                    if (moneyToAdd < 1 && CurrentDamageData.TotalDamage > 0f)
+                        moneyToAdd = 1;
+                    PlayerStatistics.AddMoney(moneyToAdd);
+
+                    if (CurrentDamageData.TargetedEnemy.Health <= 0f)
                     {
                         EnqueuedEnemyToRemove(CurrentDamageData.TargetedEnemy);
                     }
-
                 }
             } 
             //Remove Enemies
