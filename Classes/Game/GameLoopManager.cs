@@ -10,6 +10,10 @@ using UnityEngine.UI;
 
 public class GameLoopManager : MonoBehaviour 
 {
+    public List<WaveData> Waves;
+    private int currentWave = 0;
+    private bool waveInProgress = false;
+
     public static List<TowerBehaviour> TowersInGame;
     public static Vector3[] NodePositions;
     public static float[] NodeDistances;
@@ -32,8 +36,8 @@ public class GameLoopManager : MonoBehaviour
 
         Debug.Log(Time.timeScale);
 
-
-        
+        currentWave = 0;
+        waveInProgress = false;
 
         PlayerStatistics = FindObjectOfType<PlayerStats>();
         EffectsQueue = new Queue<ApplyEffectData>();
@@ -42,13 +46,7 @@ public class GameLoopManager : MonoBehaviour
         EnemyIDsToSummon = new Queue<int>();
         EnemiesToRemove = new Queue<Enemy>();
 
-        
-
         NodePositions = new Vector3[NodeParent.childCount];
-
-        EntitySummoner.SummonEnemy(1); // basic
-        EntitySummoner.SummonEnemy(2); // second
-        EntitySummoner.SummonEnemy(3); // third
 
         if (speedToggle != null) speedToggle.onValueChanged.AddListener(ChangeSpeed);
 
@@ -66,16 +64,15 @@ public class GameLoopManager : MonoBehaviour
 
         
         StartCoroutine(GameLoop());
-        InvokeRepeating("SummonTest", 0f, 1f);
-
-        
+      
     }
-
-    
-
-    void SummonTest()
+    private void Update()
     {
-        EnqueuedEnemyIDToSummon(1);
+        // Si no hay oleada en curso y no quedan enemigos vivos, lanza la siguiente oleada
+        if (!waveInProgress && EntitySummoner.EnemiesInGame != null && EntitySummoner.EnemiesInGame.Count == 0)
+        {
+            StartNextWave();
+        }
     }
 
     IEnumerator GameLoop()
@@ -202,6 +199,7 @@ public class GameLoopManager : MonoBehaviour
                     }
                 }
             } 
+
             //Remove Enemies
 
             if (EnemiesToRemove.Count > 0)
@@ -218,7 +216,32 @@ public class GameLoopManager : MonoBehaviour
 
         }
     }
+    public void StartNextWave()
+    {
+        if (currentWave < Waves.Count)
+        {
+            StartCoroutine(SpawnWave(Waves[currentWave]));
+            currentWave++;
+        }
+        else
+        {
+            Debug.Log("¡Todas las oleadas completadas!");
+        }
+    }
 
+    private IEnumerator SpawnWave(WaveData wave)
+    {
+        waveInProgress = true;
+        foreach (var enemyInfo in wave.EnemiesToSpawn)
+        {
+            for (int i = 0; i < enemyInfo.Count; i++)
+            {
+                EnqueuedEnemyIDToSummon(enemyInfo.EnemyID);
+                yield return new WaitForSeconds(wave.SpawnInterval);
+            }
+        }
+        waveInProgress = false;
+    }
     public static void EnqueueEffectToApply(ApplyEffectData effectData)
     {
         EffectsQueue.Enqueue(effectData);
