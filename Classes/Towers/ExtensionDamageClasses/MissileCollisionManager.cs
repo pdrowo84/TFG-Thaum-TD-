@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using static ElementDamageType;
 
 public class MissileCollisionManager : MonoBehaviour
 {
@@ -30,9 +31,12 @@ public class MissileCollisionManager : MonoBehaviour
 
             for(int i = 0; i < EnemiesInRadius.Length; i++)
             {
-                 Enemy EnemyToDamage = EntitySummoner.EnemyTransformPairs[EnemiesInRadius[i].transform.parent];
-                 EnemyDamageData DamageToApply = new EnemyDamageData(EnemyToDamage, BaseClass.Damage, EnemyToDamage.DamageResistance);
-                 GameLoopManager.EnqueueDamageData(DamageToApply);
+                ElementType damageType = GetComponentInParent<TowerBehaviour>().DamageElement;
+
+
+                Enemy EnemyToDamage = EntitySummoner.EnemyTransformPairs[EnemiesInRadius[i].transform.parent];
+                EnemyDamageData DamageToApply = new EnemyDamageData(EnemyToDamage, BaseClass.Damage, EnemyToDamage.DamageResistance,damageType);
+                GameLoopManager.EnqueueDamageData(DamageToApply);
                
             }
 

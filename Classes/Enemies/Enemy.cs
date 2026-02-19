@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using static ElementDamageType;
 
 public class Enemy : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class Enemy : MonoBehaviour
     public float Speed;
     public int ID;
     public int LifeDamage;
+    public int MoneyReward;
 
     public void Init()
     {
@@ -26,6 +28,15 @@ public class Enemy : MonoBehaviour
        
     }
 
+    [System.Serializable]
+    public class ElementResistance
+    {
+        public ElementType Element;
+        [Range(0, 1)] public float Resistance; // 0 = sin resistencia, 1 = inmune
+    }
+
+    public List<ElementType> Immunities; // Elementos a los que es inmune
+    public List<ElementResistance> Resistances; // Resistencias parciales
 
     public void Tick()
     {
@@ -45,7 +56,7 @@ public class Enemy : MonoBehaviour
                 else
                 {
                     Debug.Log($"[Efecto] {name} recibe {ActiveEffects[i].Damage} de daño por '{ActiveEffects[i].EffectName}'. Vida actual: {Health}");
-                    GameLoopManager.EnqueueDamageData(new EnemyDamageData(this, ActiveEffects[i].Damage, 1f));
+                    GameLoopManager.EnqueueDamageData(new EnemyDamageData(this, ActiveEffects[i].Damage, 1f, ActiveEffects[i].DamageElement));
                     ActiveEffects[i].DamageDelay = 1f / ActiveEffects[i].DamageRate;
                 }
 
@@ -58,5 +69,19 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log($"[Efecto] {name}: {eliminados} efecto(s) expirado(s) y eliminado(s).");
         }
+    }
+    public float GetElementalMultiplier(ElementType attackElement)
+    {
+        if (Immunities != null && Immunities.Contains(attackElement))
+            return 0f;
+
+        if (Resistances != null)
+        {
+            var resistance = Resistances.Find(r => r.Element == attackElement);
+            if (resistance != null)
+                return 1f - resistance.Resistance; // Ej: 0.5 resistencia = 0.5 daño recibido
+        }
+
+        return 1f; // Sin resistencia ni inmunidad
     }
 }

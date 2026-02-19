@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ac2d74869f14444c933c3ef2148dabf, type: 3}
   m_Name: SecondWaveData
   m_EditorClassIdentifier: 
-  EnemiesToSpawn: []
+  EnemiesToSpawn:
+  - EnemyID: 2
+    Count: 1
   SpawnInterval: 1

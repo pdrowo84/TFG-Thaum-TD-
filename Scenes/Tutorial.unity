@@ -7012,6 +7012,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8308812a170ac3f40ae2bc430c79bceb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Waves:
+  - {fileID: 11400000, guid: cdc118c57872dbc4b97b7f787cdca586, type: 2}
+  - {fileID: 11400000, guid: 35e59b72eb24a534f860923041fa8613, type: 2}
   NodeParent: {fileID: 1921816726}
   LoopShouldEnd: 0
   speedToggle: {fileID: 607906482}

@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class TowerBehaviour : MonoBehaviour
 {
+    public ElementDamageType.ElementType DamageElement;
 
     public LayerMask EnemiesLayer;
 

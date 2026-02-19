@@ -7,6 +7,7 @@ using Unity.Jobs;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static ElementDamageType;
 
 public class GameLoopManager : MonoBehaviour 
 {
@@ -186,7 +187,13 @@ public class GameLoopManager : MonoBehaviour
                 for (int i = 0; i < DamageData.Count; i++)
                 {
                     EnemyDamageData CurrentDamageData = DamageData.Dequeue();
-                    CurrentDamageData.TargetedEnemy.Health -= CurrentDamageData.TotalDamage / CurrentDamageData.Resistance;
+                    
+                    float multiplier = 1f;
+                    if (CurrentDamageData.DamageElement != ElementType.None)
+                        multiplier = CurrentDamageData.TargetedEnemy.GetElementalMultiplier(CurrentDamageData.DamageElement);
+
+                    // Aplica el daño con el multiplicador elemental
+                    CurrentDamageData.TargetedEnemy.Health -= (CurrentDamageData.TotalDamage * multiplier) / CurrentDamageData.Resistance;
 
                     int moneyToAdd = (int)CurrentDamageData.TotalDamage;
                     if (moneyToAdd < 1 && CurrentDamageData.TotalDamage > 0f)
@@ -206,6 +213,7 @@ public class GameLoopManager : MonoBehaviour
             {
                 for (int i = 0; i < EnemiesToRemove.Count; i++)
                 {
+
                     EntitySummoner.RemoveEnemy(EnemiesToRemove.Dequeue());
                 }
             }
@@ -300,15 +308,19 @@ public class GameLoopManager : MonoBehaviour
 
 public class Effect
 {
-    public Effect(string effectName, float damageRate, float damage, float expireTime)
+    public Effect(string effectName, float damageRate, float damage, float expireTime, ElementType damageElement)
     {
+        
         ExpireTime = expireTime;
         EffectName = effectName;
         DamageRate = damageRate;
         Damage = damage;
+        DamageElement = damageElement;
+        
     }
 
     public string EffectName;
+    public ElementType DamageElement;
 
     public float Damage;
     public float DamageRate;
@@ -330,13 +342,15 @@ public struct ApplyEffectData
 }
 public struct EnemyDamageData
 {
-    public EnemyDamageData(Enemy target, float damage, float resistance)
+    public EnemyDamageData(Enemy target, float damage, float resistance, ElementType damageElement)
     {
+        DamageElement = damageElement;
         TargetedEnemy = target;
         TotalDamage = damage;
         Resistance = resistance;
     }
 
+    public ElementType DamageElement;
     public Enemy TargetedEnemy;
     public float TotalDamage;
     public float Resistance;

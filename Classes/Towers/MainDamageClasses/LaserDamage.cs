@@ -1,4 +1,5 @@
 using UnityEngine;
+using static ElementDamageType;
 
 public class LaserDamage : MonoBehaviour, IDamageMethod
 {
@@ -29,7 +30,9 @@ public class LaserDamage : MonoBehaviour, IDamageMethod
                 return;
             }
 
-            GameLoopManager.EnqueueDamageData(new EnemyDamageData(Target, Damage, Target.DamageResistance));
+            ElementType damageType = GetComponent<TowerBehaviour>().DamageElement;
+
+            GameLoopManager.EnqueueDamageData(new EnemyDamageData(Target, Damage, Target.DamageResistance, damageType));
             Delay = 1f / FireRate;
             return;
         }

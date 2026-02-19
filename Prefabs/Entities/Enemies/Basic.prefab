@@ -49,11 +49,13 @@ MonoBehaviour:
   NodeIndex: 0
   RootPart: {fileID: 8545185801791478033}
   DamageResistance: 1
-  MaxHealth: 10
+  MaxHealth: 5
   Health: 0
   Speed: 4
   ID: 0
   LifeDamage: 1
+  Immunities: 
+  Resistances: []
 --- !u!1 &6136744077782817907
 GameObject:
   m_ObjectHideFlags: 0
