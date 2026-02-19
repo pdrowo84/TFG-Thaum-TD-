@@ -195,13 +195,10 @@ public class GameLoopManager : MonoBehaviour
                     // Aplica el daño con el multiplicador elemental
                     CurrentDamageData.TargetedEnemy.Health -= (CurrentDamageData.TotalDamage * multiplier) / CurrentDamageData.Resistance;
 
-                    int moneyToAdd = (int)CurrentDamageData.TotalDamage;
-                    if (moneyToAdd < 1 && CurrentDamageData.TotalDamage > 0f)
-                        moneyToAdd = 1;
-                    PlayerStatistics.AddMoney(moneyToAdd);
-
-                    if (CurrentDamageData.TargetedEnemy.Health <= 0f)
+                    if (CurrentDamageData.TargetedEnemy.Health <= 0f && !CurrentDamageData.TargetedEnemy.IsDead)
                     {
+                        CurrentDamageData.TargetedEnemy.IsDead = true;
+                        PlayerStatistics.AddMoney(CurrentDamageData.TargetedEnemy.MoneyReward);
                         EnqueuedEnemyToRemove(CurrentDamageData.TargetedEnemy);
                     }
                 }
@@ -265,7 +262,8 @@ public class GameLoopManager : MonoBehaviour
 
     public static void EnqueuedEnemyToRemove(Enemy EnemyToRemove)
     {
-        EnemiesToRemove.Enqueue(EnemyToRemove);
+        if (!EnemiesToRemove.Contains(EnemyToRemove))
+            EnemiesToRemove.Enqueue(EnemyToRemove);
     }
 
     public static void PauseGame()
@@ -282,11 +280,16 @@ public class GameLoopManager : MonoBehaviour
         // Limpia pools y listas para evitar referencias a objetos destruidos
         if (EntitySummoner.EnemiesInGame != null) EntitySummoner.EnemiesInGame.Clear();
         if (EntitySummoner.EnemiesIsGameTransform != null) EntitySummoner.EnemiesIsGameTransform.Clear();
-        if (TowersInGame != null) TowersInGame.Clear(); // <-- Añade esto
+        if (TowersInGame != null) TowersInGame.Clear(); 
         if (EntitySummoner.EnemyObjectPools != null)
         {
             foreach (var pool in EntitySummoner.EnemyObjectPools.Values)
                 pool.Clear();
+        }
+        // Destruye todas las torres activas en la escena
+        foreach (var tower in FindObjectsOfType<TowerBehaviour>())
+        {
+            Destroy(tower.gameObject);
         }
         Time.timeScale = 1f;
         Scene current = SceneManager.GetActiveScene();

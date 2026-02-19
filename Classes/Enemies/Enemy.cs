@@ -17,11 +17,13 @@ public class Enemy : MonoBehaviour
     public int ID;
     public int LifeDamage;
     public int MoneyReward;
+    public bool IsDead = false;
 
     public void Init()
     {
         ActiveEffects = new List<Effect>();
 
+        IsDead = false;
         Health = MaxHealth;
         transform.position = GameLoopManager.NodePositions[0];
         NodeIndex = 0;

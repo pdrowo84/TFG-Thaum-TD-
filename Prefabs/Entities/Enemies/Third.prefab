@@ -54,6 +54,9 @@ MonoBehaviour:
   Speed: 6
   ID: 0
   LifeDamage: 3
+  MoneyReward: 150
+  Immunities: 
+  Resistances: []
 --- !u!1 &6136744077782817907
 GameObject:
   m_ObjectHideFlags: 0

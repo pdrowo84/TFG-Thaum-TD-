@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class TowerBehaviour : MonoBehaviour
 {
@@ -40,7 +41,8 @@ public class TowerBehaviour : MonoBehaviour
 
         if (Target != null)
         {
-            TowerPivot.transform.rotation = Quaternion.LookRotation(Target.transform.position - transform.position);
+            Vector3 targetPos = Target.RootPart != null ? Target.RootPart.position : Target.transform.position;
+            TowerPivot.transform.rotation = Quaternion.LookRotation(targetPos - TowerPivot.position);
         }
     }
 

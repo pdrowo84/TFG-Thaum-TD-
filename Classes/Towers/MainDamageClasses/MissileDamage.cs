@@ -31,7 +31,7 @@ public class MissileDamage : MonoBehaviour, IDamageMethod
                 return;
             }
 
-
+            MissileSystem.transform.rotation = GetComponent<TowerBehaviour>().TowerPivot.rotation;
             MissileSystemMain.startRotationX = TowerHead.forward.x;
             MissileSystemMain.startRotationY = TowerHead.forward.y;
             MissileSystemMain.startRotationZ = TowerHead.forward.z;
