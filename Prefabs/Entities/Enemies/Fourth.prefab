@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5201112780589359653}
-  - component: {fileID: -7568462118824009427}
+  - component: {fileID: 6191927030680750532}
   m_Layer: 8
-  m_Name: Basic
+  m_Name: Fourth
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,7 +34,7 @@ Transform:
   - {fileID: 5511256575467318288}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-7568462118824009427
+--- !u!114 &6191927030680750532
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -49,14 +49,14 @@ MonoBehaviour:
   NodeIndex: 0
   RootPart: {fileID: 8545185801791478033}
   DamageResistance: 1
-  MaxHealth: 5
+  MaxHealth: 15
   Health: 0
-  Speed: 4
+  Speed: 7
   ID: 0
-  LifeDamage: 1
-  MoneyReward: 50
+  LifeDamage: 4
+  MoneyReward: 200
   IsDead: 0
-  Immunities: 
+  Immunities: 03000000
   Resistances: []
 --- !u!1 &6136744077782817907
 GameObject:
@@ -124,7 +124,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4ef967ea30f174e409a776b155bf0260, type: 2}
+  - {fileID: 2100000, guid: 9b4998e5a5df34e47a629e703d554485, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

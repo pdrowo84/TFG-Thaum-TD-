@@ -5,22 +5,36 @@ using System.Collections.Generic;
 
 public class PlayerStats : MonoBehaviour
 {
+    [SerializeField] private GameObject BasicTowerPrefab;
+
     [SerializeField] private GameObject GameOverPanel; // Asigna el panel en el inspector
     [SerializeField] private GameObject GameplayUIPanel; // (Opcional) Panel principal de la UI del juego
-    [SerializeField] private TextMeshProUGUI MoneyDisplayText;
+    [SerializeField] private TextMeshProUGUI MoneyDisplayText; // Añade esto en el inspector
     [SerializeField] private TextMeshProUGUI LifeDisplayText; // Añade esto en el inspector
-    [SerializeField] private int StartingMoney;
-    [SerializeField] private int StartingLife = 20; // Vida inicial
+
+    [SerializeField] private GameObject[] TowerPrefabs;
+    [SerializeField] private TextMeshProUGUI[] TowerCostTexts;
+
+    [SerializeField] private int StartingMoney; // Dinero inicial
+    [SerializeField] private int StartingLife; // Vida inicial
 
     private int CurrentMoney;
     private int CurrentLife;
-
+    
     private void Start()
     {
         CurrentMoney = StartingMoney;
         CurrentLife = StartingLife;
         MoneyDisplayText.SetText($"$ {StartingMoney}");
         LifeDisplayText.SetText($"<3 {StartingLife}");
+
+        // Mostrar el coste de cada torre
+        for (int i = 0; i < TowerPrefabs.Length && i < TowerCostTexts.Length; i++)
+        {
+            var tower = TowerPrefabs[i].GetComponent<TowerBehaviour>();
+            if (tower != null && TowerCostTexts[i] != null)
+                TowerCostTexts[i].SetText($"${tower.SummonCost}");
+        }
     }
 
     public void AddMoney(int MoneyToAdd)

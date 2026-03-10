@@ -44,8 +44,6 @@ public class Enemy : MonoBehaviour
     {
         if (this == null) return; // Protección extra
 
-        Debug.Log($"[Efecto] {name}: {ActiveEffects.Count} efectos activos.");
-
         for (int i = 0; i < ActiveEffects.Count; i++)
         {
             if (ActiveEffects[i].ExpireTime > 0f)
@@ -53,11 +51,9 @@ public class Enemy : MonoBehaviour
                 if (ActiveEffects[i].DamageDelay > 0f)
                 {
                     ActiveEffects[i].DamageDelay -= Time.deltaTime;
-                    Debug.Log($"[Efecto] {name}: Delay de '{ActiveEffects[i].EffectName}' reducido a {ActiveEffects[i].DamageDelay}");
-                }
+                    }
                 else
                 {
-                    Debug.Log($"[Efecto] {name} recibe {ActiveEffects[i].Damage} de daño por '{ActiveEffects[i].EffectName}'. Vida actual: {Health}");
                     GameLoopManager.EnqueueDamageData(new EnemyDamageData(this, ActiveEffects[i].Damage, 1f, ActiveEffects[i].DamageElement));
                     ActiveEffects[i].DamageDelay = 1f / ActiveEffects[i].DamageRate;
                 }

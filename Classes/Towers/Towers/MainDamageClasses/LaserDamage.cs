@@ -32,7 +32,7 @@ public class LaserDamage : MonoBehaviour, IDamageMethod
 
             ElementType damageType = GetComponent<TowerBehaviour>().DamageElement;
 
-            GameLoopManager.EnqueueDamageData(new EnemyDamageData(Target, Damage, Target.DamageResistance, damageType));
+            GameLoopManager.EnqueueDamageData(new EnemyDamageData(Target, GetComponent<TowerBehaviour>().Damage, Target.DamageResistance, damageType));
             Delay = 1f / FireRate;
             return;
         }

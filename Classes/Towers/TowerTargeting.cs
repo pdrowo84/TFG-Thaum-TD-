@@ -61,7 +61,7 @@ public class TowerTargeting
                 goto case 0;
         }
 
-        JobHandle dependency = new JobHandle();
+        
         JobHandle SearchJobHandle = EnemySearchJob.Schedule();
 
         SearchJobHandle.Complete();

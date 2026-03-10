@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using static ElementDamageType;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class MissileCollisionManager : MonoBehaviour
 {
@@ -41,8 +42,7 @@ public class MissileCollisionManager : MonoBehaviour
                     GameLoopManager.EnqueueDamageData(DamageToApply);
                 }
             }
-
         }
-
     }
 }
+

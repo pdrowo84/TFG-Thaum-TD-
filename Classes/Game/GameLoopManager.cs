@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections;   
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine.Jobs;
@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static ElementDamageType;
 
-public class GameLoopManager : MonoBehaviour 
+public class GameLoopManager : MonoBehaviour
 {
     public List<WaveData> Waves;
     private int currentWave = 0;
@@ -40,7 +40,7 @@ public class GameLoopManager : MonoBehaviour
         currentWave = 0;
         waveInProgress = false;
 
-        PlayerStatistics = FindObjectOfType<PlayerStats>();
+        PlayerStatistics = FindFirstObjectByType<PlayerStats>();
         EffectsQueue = new Queue<ApplyEffectData>();
         DamageData = new Queue<EnemyDamageData>();
         TowersInGame = new List<TowerBehaviour>();
@@ -63,9 +63,9 @@ public class GameLoopManager : MonoBehaviour
             NodeDistances[i] = Vector3.Distance(NodePositions[i], NodePositions[i + 1]);
         }
 
-        
+
         StartCoroutine(GameLoop());
-      
+
     }
     private void Update()
     {
@@ -86,12 +86,12 @@ public class GameLoopManager : MonoBehaviour
 
         while (LoopShouldEnd == false)
         {
-          
+
             //Spawn Enemies
 
-            if(EnemyIDsToSummon.Count > 0)
+            if (EnemyIDsToSummon.Count > 0)
             {
-                for(int i = 0;i < EnemyIDsToSummon.Count;i++)
+                for (int i = 0; i < EnemyIDsToSummon.Count; i++)
                 {
                     EntitySummoner.SummonEnemy(EnemyIDsToSummon.Dequeue());
                 }
@@ -104,9 +104,12 @@ public class GameLoopManager : MonoBehaviour
             NativeArray<Vector3> NodesToUse = new NativeArray<Vector3>(NodePositions, Allocator.TempJob);
             NativeArray<int> NodeIndicies = new NativeArray<int>(EntitySummoner.EnemiesInGame.Count, Allocator.TempJob);
             NativeArray<float> EnemySpeeds = new NativeArray<float>(EntitySummoner.EnemiesInGame.Count, Allocator.TempJob);
+
+            // Limpia los nulls de la lista antes de usarla
+            EntitySummoner.EnemiesIsGameTransform.RemoveAll(t => t == null);
             TransformAccessArray EnemyAccess = new TransformAccessArray(EntitySummoner.EnemiesIsGameTransform.ToArray(), 2);
 
-            for (int i = 0; i < EntitySummoner.EnemiesInGame.Count; i++) 
+            for (int i = 0; i < EntitySummoner.EnemiesInGame.Count; i++)
             {
                 EnemySpeeds[i] = EntitySummoner.EnemiesInGame[i].Speed;
                 NodeIndicies[i] = EntitySummoner.EnemiesInGame[i].NodeIndex;
@@ -123,11 +126,11 @@ public class GameLoopManager : MonoBehaviour
             JobHandle MoveJobHandle = MoveJob.Schedule(EnemyAccess);
             MoveJobHandle.Complete();
 
-            for(int i = 0; i < EntitySummoner.EnemiesInGame.Count; i++)
+            for (int i = 0; i < EntitySummoner.EnemiesInGame.Count; i++)
             {
                 EntitySummoner.EnemiesInGame[i].NodeIndex = NodeIndicies[i];
 
-                if(EntitySummoner.EnemiesInGame[i].NodeIndex >= NodePositions.Length)
+                if (EntitySummoner.EnemiesInGame[i].NodeIndex >= NodePositions.Length)
                 {
                     if (PlayerStatistics != null)
                     {
@@ -137,7 +140,7 @@ public class GameLoopManager : MonoBehaviour
                     EnqueuedEnemyToRemove(EntitySummoner.EnemiesInGame[i]);
                 }
             }
-            
+
             NodesToUse.Dispose();
             EnemySpeeds.Dispose();
             NodeIndicies.Dispose();
@@ -145,9 +148,9 @@ public class GameLoopManager : MonoBehaviour
 
             //Tick Towers
 
-            foreach(TowerBehaviour tower in TowersInGame)
+            foreach (TowerBehaviour tower in TowersInGame)
             {
-                tower.Target =  TowerTargeting.GetTarget(tower, TowerTargeting.TargetType.First);
+                tower.Target = TowerTargeting.GetTarget(tower, TowerTargeting.TargetType.First);
                 tower.Tick();
             }
 
@@ -164,18 +167,18 @@ public class GameLoopManager : MonoBehaviour
                         CurrentDamageData.EnemyToAffect.ActiveEffects.Add(CurrentDamageData.EffectToApply);
                         Debug.Log($"[Efecto] Añadido efecto '{CurrentDamageData.EffectToApply.EffectName}' a {CurrentDamageData.EnemyToAffect.name}");
                     }
-                
+
                     else
                     {
                         EffectDuplicate.ExpireTime = CurrentDamageData.EffectToApply.ExpireTime;
                         Debug.Log($"[Efecto] Refrescada duración de '{EffectDuplicate.EffectName}' en {CurrentDamageData.EnemyToAffect.name}");
                     }
-                
+
                 }
             }
 
             //Tick Enemies
-            foreach(Enemy CurrentEnemy in EntitySummoner.EnemiesInGame)
+            foreach (Enemy CurrentEnemy in EntitySummoner.EnemiesInGame)
             {
                 if (CurrentEnemy != null)
                     CurrentEnemy.Tick();
@@ -187,7 +190,7 @@ public class GameLoopManager : MonoBehaviour
                 for (int i = 0; i < DamageData.Count; i++)
                 {
                     EnemyDamageData CurrentDamageData = DamageData.Dequeue();
-                    
+
                     float multiplier = 1f;
                     if (CurrentDamageData.DamageElement != ElementType.None)
                         multiplier = CurrentDamageData.TargetedEnemy.GetElementalMultiplier(CurrentDamageData.DamageElement);
@@ -202,7 +205,7 @@ public class GameLoopManager : MonoBehaviour
                         EnqueuedEnemyToRemove(CurrentDamageData.TargetedEnemy);
                     }
                 }
-            } 
+            }
 
             //Remove Enemies
 
@@ -217,7 +220,7 @@ public class GameLoopManager : MonoBehaviour
 
             //Remove Towers
 
-            yield return null;  
+            yield return null;
 
         }
     }
@@ -273,25 +276,42 @@ public class GameLoopManager : MonoBehaviour
     public static void ResumeGame()
     {
         Time.timeScale = 1f;
-    }  
-    
+    }
+
     public static void ResetGame()
     {
-        // Limpia pools y listas para evitar referencias a objetos destruidos
+        // Detener cualquier loop activo en instancias existentes
+        foreach (var manager in Object.FindObjectsOfType<GameLoopManager>())
+        {
+            manager.LoopShouldEnd = true;
+            manager.StopAllCoroutines();
+        }
+
+        // Limpiar colas estáticas para evitar aplicar daño/efectos pendientes tras el reload
+        if (EffectsQueue != null) EffectsQueue.Clear();
+        if (DamageData != null) DamageData.Clear();
+        if (EnemyIDsToSummon != null) EnemyIDsToSummon.Clear();
+        if (EnemiesToRemove != null) EnemiesToRemove.Clear();
+
+        // Limpiar y destruir objetos pool antiguos para evitar estados persistentes (e.g. enemigos dañados)
+        EntitySummoner.ForceReinit(destroyPooledObjects: true);
+
+        // Limpia listas públicas/estáticas referenciadas por el GameLoop
         if (EntitySummoner.EnemiesInGame != null) EntitySummoner.EnemiesInGame.Clear();
         if (EntitySummoner.EnemiesIsGameTransform != null) EntitySummoner.EnemiesIsGameTransform.Clear();
-        if (TowersInGame != null) TowersInGame.Clear(); 
-        if (EntitySummoner.EnemyObjectPools != null)
+        if (TowersInGame != null) TowersInGame.Clear();
+
+        // Destruye todas las torres activas en la escena actual por si quedan instancias huérfanas
+        foreach (var tower in Object.FindObjectsOfType<TowerBehaviour>())
         {
-            foreach (var pool in EntitySummoner.EnemyObjectPools.Values)
-                pool.Clear();
+            if (tower != null)
+                Object.Destroy(tower.gameObject);
         }
-        // Destruye todas las torres activas en la escena
-        foreach (var tower in FindObjectsOfType<TowerBehaviour>())
-        {
-            Destroy(tower.gameObject);
-        }
+
+        // Asegura escala de tiempo normalizada
         Time.timeScale = 1f;
+
+        // Recarga la escena (estado ya limpiado)
         Scene current = SceneManager.GetActiveScene();
         SceneManager.LoadScene(current.name);
     }
@@ -313,13 +333,13 @@ public class Effect
 {
     public Effect(string effectName, float damageRate, float damage, float expireTime, ElementType damageElement)
     {
-        
+
         ExpireTime = expireTime;
         EffectName = effectName;
         DamageRate = damageRate;
         Damage = damage;
         DamageElement = damageElement;
-        
+
     }
 
     public string EffectName;
@@ -377,10 +397,10 @@ public struct MoveEnemyJob : IJobParallelForTransform
 
         Vector3 PositionToMove = NodePositions[NodeIndex[index]];
         transform.position = Vector3.MoveTowards(transform.position, PositionToMove, EnemySpeeds[index] * DeltaTime);
-         
-        if(transform.position == PositionToMove)
+
+        if (transform.position == PositionToMove)
         {
-            NodeIndex[index] ++;
+            NodeIndex[index]++;
         }
 
     }

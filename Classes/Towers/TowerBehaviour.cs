@@ -10,10 +10,12 @@ public class TowerBehaviour : MonoBehaviour
     public Enemy Target;
     public Transform TowerPivot;
 
+    public bool HasHeroBuff = false;
+
     public float Damage;
     public float FireRate;
     public float Range;
-    public int SummonCost = 100;
+    public int SummonCost;
     private float Delay;
 
     private IDamageMethod CurrentDamageMethodClass;

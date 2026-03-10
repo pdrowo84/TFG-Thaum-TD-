@@ -29,7 +29,7 @@ public class FlameThrowerDamage : MonoBehaviour, IDamageMethod
 
             // Encola el daño para que GameLoopManager lo procese con resistencias/inmunidades
             GameLoopManager.EnqueueDamageData(
-                new EnemyDamageData(Target, Damage * Time.deltaTime, Target.DamageResistance, damageType)
+                new EnemyDamageData(Target, GetComponent<TowerBehaviour>().Damage * Time.deltaTime, Target.DamageResistance, damageType)
             );
             return;
         }

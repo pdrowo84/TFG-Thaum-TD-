@@ -90,6 +90,13 @@ public class TowerPlacing : MonoBehaviour
             CurrentPlacingTower = null;
         }
 
+        // Bloquea la colocación si ya hay una torre héroe
+        if (tower.GetComponent<HeroTower>() && HeroTower.HeroPlaced)
+        {
+            Debug.LogWarning("¡Solo puedes colocar una torre héroe por partida!");
+            return;
+        }
+
         int TowerSummonCost = tower.GetComponent<TowerBehaviour>().SummonCost;
 
         if (PlayerStatisctics.GetMoney() >= TowerSummonCost)
@@ -117,5 +124,24 @@ public class TowerPlacing : MonoBehaviour
         }
     }
 
+    public class HeroTower : TowerBehaviour
+    {
+        public static bool HeroPlaced = false;
 
+        void Awake()
+        {
+            if (HeroPlaced)
+            {
+                Debug.LogWarning("¡Ya hay una torre héroe en la partida!");
+                Destroy(gameObject);
+                return;
+            }
+            HeroPlaced = true;
+        }
+
+        void OnDestroy()
+        {
+            HeroPlaced = false;
+        }
+    }
 }

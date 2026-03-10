@@ -2,12 +2,8 @@ using UnityEngine;
 using static ElementDamageType;
 
 
-public interface IDamageMethod
-{
-    public void DamageTick(Enemy Target);
-    public void Init(float Damage, float FireRate);
-}
-public class StandardDamage : MonoBehaviour, IDamageMethod
+
+public class TornadoHeroeDamage : MonoBehaviour, IDamageMethod
 {
     [SerializeField] private Transform FirePoint; // Punto de salida de la bala
     [SerializeField] private GameObject BulletPrefab; // Prefab de la bala
@@ -17,7 +13,7 @@ public class StandardDamage : MonoBehaviour, IDamageMethod
     private float Delay;
     public void Init(float Damage, float FireRate)
     {
-        this.Damage = Damage;
+
         this.FireRate = FireRate;
         Delay = 1f / FireRate;
     }
@@ -39,13 +35,12 @@ public class StandardDamage : MonoBehaviour, IDamageMethod
                 StandardBullet bulletScript = bullet.GetComponent<StandardBullet>();
                 if (bulletScript != null)
                 {
-                    bulletScript.Init(Target, Damage, GetComponent<TowerBehaviour>().DamageElement);
+                    bulletScript.Init(Target, GetComponent<TowerBehaviour>().Damage, GetComponent<TowerBehaviour>().DamageElement);
                 }
             }
 
             Delay = 1f / FireRate;
         }
-        
-    }
 
+    }
 }
