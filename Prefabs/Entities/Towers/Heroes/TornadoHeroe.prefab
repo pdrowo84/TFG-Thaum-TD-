@@ -203,6 +203,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BuffRadius: 5
   DamageBuff: 2
+  RequiredElement: 4
+  AbilityCooldown: 30
+  TornadoPrefab: {fileID: 905197000048422588, guid: b4fe1417edd1c094d8b1dfb03f250630, type: 3}
+  TornadoSpawnPoint: {fileID: 0}
+  TornadoDuration: 5
+  TornadoDamageMultiplier: 3
+  ShowPassiveRadius: 1
+  PassiveRadiusColor: {r: 0.7809719, g: 0.8490566, b: 0.8490566, a: 0.5}
+  PassiveLineWidth: 0.2
 --- !u!114 &-3077957878964217363
 MonoBehaviour:
   m_ObjectHideFlags: 0
