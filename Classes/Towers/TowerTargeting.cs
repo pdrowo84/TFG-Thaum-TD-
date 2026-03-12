@@ -1,186 +1,225 @@
-using Unity.Collections;
-using Unity.Jobs;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class TowerTargeting
+public class TowerTargeting : MonoBehaviour
 {
     public enum TargetType
     {
-        First,
-        Last,
-        Close,
-        Strong,
-        Weak
-
+        First,    // Primer enemigo en el camino (más avanzado)
+        Last,     // Último enemigo en el camino (más atrasado)
+        Close,    // Enemigo más cercano a la torre
+        Strong,   // Enemigo con más vida
+        Weak      // Enemigo con menos vida
     }
-    public static Enemy GetTarget(TowerBehaviour CurrentTower, TargetType TargetMethod)
+
+    // **NUEVO: Enum para filtro por elemento**
+    public enum ElementFilter
     {
-        Collider[] EnemiesInRange = Physics.OverlapSphere(CurrentTower.transform.position, CurrentTower.Range, CurrentTower.EnemiesLayer);
-        NativeArray<EnemyData> EnemiesToCalulate = new NativeArray<EnemyData>(EnemiesInRange.Length, Allocator.TempJob);
-        NativeArray<Vector3> NodePositions = new NativeArray<Vector3>(GameLoopManager.NodePositions, Allocator.TempJob);
-        NativeArray<float> NodeDistances = new NativeArray<float>(GameLoopManager.NodeDistances, Allocator.TempJob);
-        NativeArray<int> EnemyToIndex = new NativeArray<int>(new int[] { -1 }, Allocator.TempJob);
-        int EnemyIndexToReturn = -1;
+        Any,      // Cualquier enemigo (sin filtro)
+        Fire,     // Solo enemigos de fuego
+        Water,    // Solo enemigos de agua
+        Wind,     // Solo enemigos de viento
+        Rock      // Solo enemigos de roca/tierra
+    }
 
-
-        for (int i = 0; i < EnemiesInRange.Length; i++)
-        {
-            Enemy CurrentEnemy = EnemiesInRange[i].transform.parent.GetComponent<Enemy>();
-            int EnemyIndexInList = EntitySummoner.EnemiesInGame.FindIndex(x => x == CurrentEnemy);
-
-            EnemiesToCalulate[i] = new EnemyData(CurrentEnemy.transform.position, CurrentEnemy.NodeIndex, CurrentEnemy.Health, EnemyIndexInList);
-        }
-
-        SearchForEnemy EnemySearchJob = new SearchForEnemy
-        {
-            _EnemiestoCalculate = EnemiesToCalulate,
-            _NodePositions = NodePositions,
-            _NodeDistances = NodeDistances,
-            _EnemyToIndex = EnemyToIndex,
-            TargetingType = (int)TargetMethod,
-            TowerPosition = CurrentTower.transform.position,
-        };
-
-        switch ((int)TargetMethod)
-        {
-            case 0: //First
-                EnemySearchJob.CompareValue = Mathf.Infinity;
-                break;
-
-            case 1: //Last
-                EnemySearchJob.CompareValue = Mathf.NegativeInfinity;
-                break;
-
-            case 2: //Close
-                goto case 0;
-
-            case 3: //Strong
-                goto case 1;
-
-            case 4: // Weak
-                goto case 0;
-        }
-
-        
-        JobHandle SearchJobHandle = EnemySearchJob.Schedule();
-
-        SearchJobHandle.Complete();
-
-        if (EnemiesToCalulate.Length == 0 || EnemyToIndex[0] == -1)
-        {
-            EnemiesToCalulate.Dispose();
-            NodePositions.Dispose();
-            NodeDistances.Dispose();
-            EnemyToIndex.Dispose();
+    /// <summary>
+    /// Obtiene el objetivo según el modo de targeting y filtro de elemento
+    /// </summary>
+    public static Enemy GetTarget(TowerBehaviour tower, TargetType targetType)
+    {
+        if (EntitySummoner.EnemiesInGame == null || EntitySummoner.EnemiesInGame.Count == 0)
             return null;
-        }
-        EnemyIndexToReturn = EnemiesToCalulate[EnemyToIndex[0]].EnemyIndex;
 
-        EnemiesToCalulate.Dispose();
-        NodePositions.Dispose();
-        NodeDistances.Dispose();
-        EnemyToIndex.Dispose();
+        // Filtrar enemigos dentro del rango
+        List<Enemy> enemiesInRange = new List<Enemy>();
 
-        if (EnemyIndexToReturn < 0 || EnemyIndexToReturn >= EntitySummoner.EnemiesInGame.Count)
+        foreach (Enemy enemy in EntitySummoner.EnemiesInGame)
         {
-            return null;
-        }
-        return EntitySummoner.EnemiesInGame[EnemyIndexToReturn];
+            if (enemy == null || enemy.IsDead) continue;
 
-    }
-
-    struct EnemyData
-    {
-        public EnemyData(Vector3 position, int nodeindex, float hp, int enemyIndex)
-        {
-            EnemyPosition = position;
-            NodeIndex = nodeindex;
-            EnemyIndex = enemyIndex;
-            Health = hp;
-        }
-
-        public Vector3 EnemyPosition;
-        public int EnemyIndex;
-        public int NodeIndex;
-        public float Health;
-
-    }
-    struct SearchForEnemy : IJob
-    {
-        public NativeArray<EnemyData> _EnemiestoCalculate;
-        public NativeArray<Vector3> _NodePositions;
-        public NativeArray<float> _NodeDistances;
-        public NativeArray<int> _EnemyToIndex;
-        public Vector3 TowerPosition;
-        public float CompareValue;
-        public int TargetingType;
-
-        public void Execute()
-        {
-            for (int index = 0; index < _EnemiestoCalculate.Length; index++)
+            float distance = Vector3.Distance(tower.transform.position, enemy.transform.position);
+            if (distance <= tower.Range)
             {
-                float CurrentDistanceToEnd = 0;
-                float DistanceToEnemy = 0;
-                switch (TargetingType)
-                {
-                    case 0: //First
-                        CurrentDistanceToEnd = GetDistanceToEnd(_EnemiestoCalculate[index]);
-                        if (CurrentDistanceToEnd < CompareValue)
-                        {
-                            _EnemyToIndex[0] = index;
-                            CompareValue = CurrentDistanceToEnd;
-                        }
-                        break;
-                    case 1: //Last
-                        CurrentDistanceToEnd = GetDistanceToEnd(_EnemiestoCalculate[index]);
-                        if (CurrentDistanceToEnd > CompareValue)
-                        {
-                            _EnemyToIndex[0] = index;
-                            CompareValue = CurrentDistanceToEnd;
-                        }
-                        break;
-                    case 2: //Close
-                        DistanceToEnemy = Vector3.Distance(TowerPosition, _EnemiestoCalculate[index].EnemyPosition);
-                        if (DistanceToEnemy < CompareValue)
-                        {
-                            _EnemyToIndex[0] = index;
-                            CompareValue = DistanceToEnemy;
-                        }
-                        break;
-                    case 3: //Strong
-         
-                        if (_EnemiestoCalculate[index].Health > CompareValue)
-                        {
-                            _EnemyToIndex[0] = index;
-                            CompareValue = _EnemiestoCalculate[index].Health;
-                        }
-                        break;
-                    case 4: //Weak
-                        if (_EnemiestoCalculate[index].Health < CompareValue)
-                        {
-                            _EnemyToIndex[0] = index;
-                            CompareValue = _EnemiestoCalculate[index].Health;
-                        }
-                        break;
-                }
+                enemiesInRange.Add(enemy);
             }
         }
 
-        private float GetDistanceToEnd(EnemyData EnemyToEvaluate)
-        {
-            if (EnemyToEvaluate.NodeIndex < 0 || EnemyToEvaluate.NodeIndex >= _NodePositions.Length)
-                return 0f;
+        if (enemiesInRange.Count == 0)
+            return null;
 
-            float FinalDistance = Vector3.Distance(EnemyToEvaluate.EnemyPosition, _NodePositions[EnemyToEvaluate.NodeIndex]);
-            for (int i = EnemyToEvaluate.NodeIndex; i < _NodePositions.Length - 1 && i < _NodeDistances.Length; i++)
-            {
-                FinalDistance += _NodeDistances[i];
-            }
-            return FinalDistance;
+        // **NUEVO: Aplicar filtro de elemento**
+        List<Enemy> filteredEnemies = ApplyElementFilter(enemiesInRange, tower.ElementPriorityFilter);
+
+        // Si no hay enemigos del elemento filtrado, buscar cualquier enemigo
+        if (filteredEnemies.Count == 0)
+        {
+            filteredEnemies = enemiesInRange;
+        }
+
+        // Seleccionar objetivo según el modo
+        switch (targetType)
+        {
+            case TargetType.First:
+                return GetFirstEnemy(filteredEnemies);
+
+            case TargetType.Last:
+                return GetLastEnemy(filteredEnemies);
+
+            case TargetType.Close:
+                return GetClosestEnemy(tower.transform.position, filteredEnemies);
+
+            case TargetType.Strong:
+                return GetStrongestEnemy(filteredEnemies);
+
+            case TargetType.Weak:
+                return GetWeakestEnemy(filteredEnemies);
+
+            default:
+                return GetFirstEnemy(filteredEnemies);
         }
     }
 
+    /// <summary>
+    /// Filtra enemigos por elemento
+    /// </summary>
+    private static List<Enemy> ApplyElementFilter(List<Enemy> enemies, ElementFilter filter)
+    {
+        if (filter == ElementFilter.Any)
+            return enemies;
+
+        List<Enemy> filtered = new List<Enemy>();
+        ElementDamageType.ElementType targetElement = ConvertFilterToElementType(filter);
+
+        foreach (Enemy enemy in enemies)
+        {
+            // Si el enemigo tiene el campo EnemyElementType, usarlo
+            if (enemy.EnemyElementType == targetElement)
+            {
+                filtered.Add(enemy);
+            }
+        }
+
+        return filtered;
+    }
+
+    /// <summary>
+    /// Convierte el filtro a ElementType
+    /// </summary>
+    private static ElementDamageType.ElementType ConvertFilterToElementType(ElementFilter filter)
+    {
+        switch (filter)
+        {
+            case ElementFilter.Fire:
+                return ElementDamageType.ElementType.Fire;
+            case ElementFilter.Water:
+                return ElementDamageType.ElementType.Water;
+            case ElementFilter.Wind:
+                return ElementDamageType.ElementType.Wind;
+            case ElementFilter.Rock:
+                return ElementDamageType.ElementType.Rock;
+            default:
+                return ElementDamageType.ElementType.None;
+        }
+    }
+
+    /// <summary>
+    /// Primer enemigo (más avanzado en el camino)
+    /// </summary>
+    private static Enemy GetFirstEnemy(List<Enemy> enemies)
+    {
+        Enemy firstEnemy = null;
+        int maxNodeIndex = -1;
+
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy.NodeIndex > maxNodeIndex)
+            {
+                maxNodeIndex = enemy.NodeIndex;
+                firstEnemy = enemy;
+            }
+        }
+
+        return firstEnemy;
+    }
+
+    /// <summary>
+    /// Último enemigo (más atrasado en el camino)
+    /// </summary>
+    private static Enemy GetLastEnemy(List<Enemy> enemies)
+    {
+        Enemy lastEnemy = null;
+        int minNodeIndex = int.MaxValue;
+
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy.NodeIndex < minNodeIndex)
+            {
+                minNodeIndex = enemy.NodeIndex;
+                lastEnemy = enemy;
+            }
+        }
+
+        return lastEnemy;
+    }
+
+    /// <summary>
+    /// Enemigo más cercano a la torre
+    /// </summary>
+    private static Enemy GetClosestEnemy(Vector3 towerPosition, List<Enemy> enemies)
+    {
+        Enemy closestEnemy = null;
+        float minDistance = float.MaxValue;
+
+        foreach (Enemy enemy in enemies)
+        {
+            float distance = Vector3.Distance(towerPosition, enemy.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestEnemy = enemy;
+            }
+        }
+
+        return closestEnemy;
+    }
+
+    /// <summary>
+    /// Enemigo con más vida (más resistente)
+    /// </summary>
+    private static Enemy GetStrongestEnemy(List<Enemy> enemies)
+    {
+        Enemy strongestEnemy = null;
+        float maxHealth = 0f;
+
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy.Health > maxHealth)
+            {
+                maxHealth = enemy.Health;
+                strongestEnemy = enemy;
+            }
+        }
+
+        return strongestEnemy;
+    }
+
+    /// <summary>
+    /// Enemigo con menos vida (más débil)
+    /// </summary>
+    private static Enemy GetWeakestEnemy(List<Enemy> enemies)
+    {
+        Enemy weakestEnemy = null;
+        float minHealth = float.MaxValue;
+
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy.Health < minHealth)
+            {
+                minHealth = enemy.Health;
+                weakestEnemy = enemy;
+            }
+        }
+
+        return weakestEnemy;
+    }
 }
-
-
-

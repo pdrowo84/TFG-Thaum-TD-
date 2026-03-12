@@ -1,6 +1,7 @@
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 /// <summary>
 /// Maneja la UI que aparece al seleccionar una torre
@@ -16,6 +17,7 @@ public class TowerUIManager : MonoBehaviour
 
     // Referencias para Fase 3, 4 y 5
     public TMP_Dropdown TargetingDropdown;
+    public TMP_Dropdown ElementFilterDropdown; // **NUEVO: Dropdown de filtro por elemento**
     public GameObject UpgradePanel;
     public Button SellButton;
     public TextMeshProUGUI SellButtonText; // Texto del botón de venta (muestra el valor)
@@ -73,6 +75,12 @@ public class TowerUIManager : MonoBehaviour
             SellConfirmationPanel.SetActive(false);
         }
 
+        if (ElementFilterDropdown != null)
+        {
+            ElementFilterDropdown.onValueChanged.AddListener(OnElementFilterChanged);
+            PopulateElementFilterDropdown();
+        }
+
         // Verificar que tengamos la referencia a la imagen de fondo
         if (PanelBackgroundImage == null && TowerInfoPanel != null)
         {
@@ -84,6 +92,54 @@ public class TowerUIManager : MonoBehaviour
         {
             SellButton.onClick.AddListener(OnSellButtonClicked);
         }
+
+        if (TargetingDropdown != null)
+        {
+            TargetingDropdown.onValueChanged.AddListener(OnTargetingChanged);
+            PopulateTargetingDropdown();
+        }
+    }
+
+    /// <summary>
+    /// Poblar el dropdown de filtro de elemento
+    /// </summary>
+    private void PopulateElementFilterDropdown()
+    {
+        if (ElementFilterDropdown == null) return;
+
+        ElementFilterDropdown.ClearOptions();
+
+        List<string> options = new List<string>
+    {
+        "Cualquiera",  // Any
+        "Fuego",       // Fire
+        "Agua",        // Water
+        "Viento",      // Wind
+        "Roca"         // Rock
+    };
+
+        ElementFilterDropdown.AddOptions(options);
+    }
+
+    /// <summary>
+    /// Poblar el dropdown con los modos de targeting
+    /// </summary>
+    private void PopulateTargetingDropdown()
+    {
+        if (TargetingDropdown == null) return;
+
+        TargetingDropdown.ClearOptions();
+
+        List<string> options = new List<string>
+    {
+        "Primero",   // First
+        "Último",    // Last
+        "Cercano",   // Close
+        "Fuerte",    // Strong
+        "Débil"      // Weak
+    };
+
+        TargetingDropdown.AddOptions(options);
     }
 
     public void ShowTowerInfo(TowerBehaviour tower)
@@ -129,6 +185,45 @@ public class TowerUIManager : MonoBehaviour
 
         // Actualizar botón de venta
         UpdateSellButton(tower);
+
+        // Actualizar dropdown de targeting**
+        UpdateTargetingDropdown(tower);
+
+        // Actualizar dropdown de filtro de elemento**
+        UpdateElementFilterDropdown(tower);
+    }
+
+    /// <summary>
+    /// Actualiza el dropdown de filtro de elemento
+    /// </summary>
+    private void UpdateElementFilterDropdown(TowerBehaviour tower)
+    {
+        if (ElementFilterDropdown == null) return;
+
+        int dropdownIndex = (int)tower.ElementPriorityFilter;
+        ElementFilterDropdown.SetValueWithoutNotify(dropdownIndex);
+    }
+
+    /// <summary>
+    /// Callback cuando se cambia el filtro de elemento
+    /// </summary>
+    public void OnElementFilterChanged(int index)
+    {
+        if (currentTower == null) return;
+
+        TowerTargeting.ElementFilter newFilter = (TowerTargeting.ElementFilter)index;
+        currentTower.SetElementFilter(newFilter);
+
+        Debug.Log($"TowerUIManager: Filtro de elemento cambiado a {newFilter}");
+    }
+
+    private void UpdateTargetingDropdown(TowerBehaviour tower)
+    {
+        if (TargetingDropdown == null) return;
+
+        // Convertir el enum a índice del dropdown
+        int dropdownIndex = (int)tower.TargetingMode;
+        TargetingDropdown.SetValueWithoutNotify(dropdownIndex);
     }
 
     private void UpdateSellButton(TowerBehaviour tower)
@@ -247,6 +342,7 @@ public class TowerUIManager : MonoBehaviour
         Debug.Log("TowerUIManager: Torre destruida.");
     }
 
+
     public void HideTowerInfo()
     {
         if (TowerInfoPanel != null)
@@ -299,6 +395,18 @@ public class TowerUIManager : MonoBehaviour
     }
 
     // Métodos para Fase 3 y 4 (implementaremos después)
-    public void OnTargetingChanged(int index) { }
+    /// <summary>
+    /// Callback cuando se cambia el dropdown de targeting
+    /// </summary>
+    public void OnTargetingChanged(int index)
+    {
+        if (currentTower == null) return;
+
+        // Convertir índice del dropdown a enum
+        TowerTargeting.TargetType newMode = (TowerTargeting.TargetType)index;
+        currentTower.SetTargetingMode(newMode);
+
+        Debug.Log($"TowerUIManager: Targeting cambiado a {newMode}");
+    }
     public void OnUpgradeButtonClicked(int upgradeIndex) { }
 }

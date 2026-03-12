@@ -5,6 +5,9 @@ using static ElementDamageType;
 
 public class Enemy : MonoBehaviour
 {
+    [Header("Enemy Type")]
+    public ElementDamageType.ElementType EnemyElementType = ElementDamageType.ElementType.None;
+
     public int NodeIndex;
 
     public List<Effect> ActiveEffects;

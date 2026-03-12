@@ -17,11 +17,20 @@ public class TowerBehaviour : MonoBehaviour
     public float Range;
     public int SummonCost;
 
-    // **NUEVO: Tracking para el sistema de venta**
+    // Sistema de venta
     [HideInInspector]
-    public int TotalInvestedCost; // Coste total invertido (colocación + upgrades)
+    public int TotalInvestedCost;
     [Tooltip("Porcentaje del coste que se devuelve al vender (0-100)")]
-    public float SellRefundPercentage = 70f; // 70% de refund por defecto
+    public float SellRefundPercentage = 70f;
+
+    // Sistema de targeting
+    [Header("Targeting Settings")]
+    [Tooltip("Modo de apuntado de la torre")]
+    public TowerTargeting.TargetType TargetingMode = TowerTargeting.TargetType.First;
+
+    // **NUEVO: Filtro por elemento**
+    [Tooltip("Filtro de elemento prioritario (None = cualquier enemigo)")]
+    public TowerTargeting.ElementFilter ElementPriorityFilter = TowerTargeting.ElementFilter.Any;
 
     private float Delay;
 
@@ -75,6 +84,24 @@ public class TowerBehaviour : MonoBehaviour
     public void AddInvestedCost(int cost)
     {
         TotalInvestedCost += cost;
+    }
+
+    /// <summary>
+    /// Cambia el modo de targeting de la torre
+    /// </summary>
+    public void SetTargetingMode(TowerTargeting.TargetType newMode)
+    {
+        TargetingMode = newMode;
+        Debug.Log($"TowerBehaviour: Modo de targeting cambiado a {newMode}");
+    }
+
+    /// <summary>
+    /// Cambia el filtro de elemento prioritario
+    /// </summary>
+    public void SetElementFilter(TowerTargeting.ElementFilter newFilter)
+    {
+        ElementPriorityFilter = newFilter;
+        Debug.Log($"TowerBehaviour: Filtro de elemento cambiado a {newFilter}");
     }
 
     void OnDrawGizmosSelected()
