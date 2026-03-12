@@ -842,6 +842,7 @@ MonoBehaviour:
     m_Bits: 256
   Target: {fileID: 0}
   TowerPivot: {fileID: 2542634948385136272}
+  HasHeroBuff: 0
   Damage: 1
   FireRate: 1
   Range: 5

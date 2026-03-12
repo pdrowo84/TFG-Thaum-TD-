@@ -16,11 +16,17 @@ public class TowerPlacing : MonoBehaviour
     public static bool HeroPlaced = false;
     private static Button heroPlacementButton;
 
+    // Referencia al TowerSelection para notificar cuando se coloca una torre
+    private TowerSelection towerSelection;
+
     void Start()
     {
         // Resetear el estado del héroe al iniciar (por si viene de un reset)
         HeroPlaced = false;
         heroPlacementButton = null;
+
+        // Buscar TowerSelection
+        towerSelection = FindObjectOfType<TowerSelection>();
     }
 
     void Update()
@@ -87,6 +93,13 @@ public class TowerPlacing : MonoBehaviour
                         }
 
                         TowerCollider.isTrigger = false;
+
+                        // **NUEVO: Deseleccionar cualquier torre antes de limpiar la referencia**
+                        if (towerSelection != null)
+                        {
+                            towerSelection.DeselectTower();
+                        }
+
                         CurrentPlacingTower = null;
                     }
                 }
@@ -96,6 +109,12 @@ public class TowerPlacing : MonoBehaviour
 
     public void SetTowerToPlace(GameObject tower)
     {
+        // **NUEVO: Deseleccionar torre actual antes de empezar a colocar una nueva**
+        if (towerSelection != null)
+        {
+            towerSelection.DeselectTower();
+        }
+
         // Si ya hay una torre en previsualización, elimínala
         if (CurrentPlacingTower != null)
         {

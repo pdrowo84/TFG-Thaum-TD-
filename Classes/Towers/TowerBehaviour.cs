@@ -16,15 +16,28 @@ public class TowerBehaviour : MonoBehaviour
     public float FireRate;
     public float Range;
     public int SummonCost;
+
+    // **NUEVO: Tracking para el sistema de venta**
+    [HideInInspector]
+    public int TotalInvestedCost; // Coste total invertido (colocación + upgrades)
+    [Tooltip("Porcentaje del coste que se devuelve al vender (0-100)")]
+    public float SellRefundPercentage = 70f; // 70% de refund por defecto
+
     private float Delay;
 
     private IDamageMethod CurrentDamageMethodClass;
 
     void Start()
     {
+        // Inicializar el coste total invertido con el coste de colocación
+        if (TotalInvestedCost == 0)
+        {
+            TotalInvestedCost = SummonCost;
+        }
+
         CurrentDamageMethodClass = GetComponent<IDamageMethod>();
 
-        if(CurrentDamageMethodClass == null)
+        if (CurrentDamageMethodClass == null)
         {
             Debug.LogError("TOWERS: No damage class attached to given tower!");
         }
@@ -34,7 +47,7 @@ public class TowerBehaviour : MonoBehaviour
             CurrentDamageMethodClass.Init(Damage, FireRate);
         }
 
-        Delay = 1/ FireRate;
+        Delay = 1 / FireRate;
     }
 
     public void Tick()
@@ -48,11 +61,25 @@ public class TowerBehaviour : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Calcula el dinero que se devuelve al vender esta torre
+    /// </summary>
+    public int GetSellValue()
+    {
+        return Mathf.RoundToInt(TotalInvestedCost * (SellRefundPercentage / 100f));
+    }
+
+    /// <summary>
+    /// Añade coste al total invertido (por ejemplo, al comprar upgrades)
+    /// </summary>
+    public void AddInvestedCost(int cost)
+    {
+        TotalInvestedCost += cost;
+    }
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.black;
         Gizmos.DrawWireSphere(transform.position, Range);
     }
-
-
 }
