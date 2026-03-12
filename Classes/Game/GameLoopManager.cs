@@ -308,6 +308,9 @@ public class GameLoopManager : MonoBehaviour
                 Object.Destroy(tower.gameObject);
         }
 
+        // Resetear el estado del héroe
+        TowerPlacing.ResetHeroPlacement();
+
         // Asegura escala de tiempo normalizada
         Time.timeScale = 1f;
 
