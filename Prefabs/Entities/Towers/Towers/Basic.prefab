@@ -698,6 +698,12 @@ MonoBehaviour:
   FireRate: 3
   Range: 5
   SummonCost: 200
+  TotalInvestedCost: 0
+  SellRefundPercentage: 70
+  TargetingMode: 0
+  ElementPriorityFilter: 0
+  UpgradePath: {fileID: 11400000, guid: 97eb453f7d671c04a93a791c4c9bb435, type: 2}
+  CurrentUpgradeState: 0
 --- !u!114 &8894639727408686386
 MonoBehaviour:
   m_ObjectHideFlags: 0

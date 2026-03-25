@@ -15,7 +15,8 @@ public class TowerUIManager : MonoBehaviour
     public TextMeshProUGUI TowerStatsText;
     public TextMeshProUGUI TowerElementText;
 
-    // Referencias para Fase 3, 4 y 5
+    public TowerUpgradeUI UpgradeUI;
+
     public TMP_Dropdown TargetingDropdown;
     public TMP_Dropdown ElementFilterDropdown; // **NUEVO: Dropdown de filtro por elemento**
     public GameObject UpgradePanel;
@@ -191,6 +192,17 @@ public class TowerUIManager : MonoBehaviour
 
         // Actualizar dropdown de filtro de elemento**
         UpdateElementFilterDropdown(tower);
+
+        // Mostrar UI de upgrades (o ocultar panel si no hay UI)
+        if (UpgradeUI != null)
+        {
+            UpgradeUI.ShowForTower(tower);
+        }
+        else if (UpgradePanel != null)
+        {
+            UpgradePanel.SetActive(false);
+        }
+
     }
 
     /// <summary>

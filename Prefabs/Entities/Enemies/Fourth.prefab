@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd0bc69a6516d8346a2500ca9150b96e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EnemyElementType: 0
   NodeIndex: 0
   RootPart: {fileID: 8545185801791478033}
   DamageResistance: 1
@@ -53,7 +54,7 @@ MonoBehaviour:
   Health: 0
   Speed: 7
   ID: 0
-  LifeDamage: 4
+  LifeDamage: 8
   MoneyReward: 200
   IsDead: 0
   Immunities: 03000000

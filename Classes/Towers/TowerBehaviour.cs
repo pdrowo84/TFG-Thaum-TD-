@@ -28,9 +28,16 @@ public class TowerBehaviour : MonoBehaviour
     [Tooltip("Modo de apuntado de la torre")]
     public TowerTargeting.TargetType TargetingMode = TowerTargeting.TargetType.First;
 
-    // **NUEVO: Filtro por elemento**
-    [Tooltip("Filtro de elemento prioritario (None = cualquier enemigo)")]
+    // Filtro por elemento
+    [Tooltip("Filtro de elemento prioritario (Any = cualquier enemigo)")]
     public TowerTargeting.ElementFilter ElementPriorityFilter = TowerTargeting.ElementFilter.Any;
+
+    // ---------------- Upgrades ----------------
+    [Header("Upgrades")]
+    public TowerUpgradePath UpgradePath; // Asignar ScriptableObject con las dos ramas
+    public enum UpgradeState { None = 0, A1 = 1, A2 = 2, B1 = 3, B2 = 4 }
+    [HideInInspector] public UpgradeState CurrentUpgradeState = UpgradeState.None;
+    // ------------------------------------------
 
     private float Delay;
 
@@ -50,7 +57,6 @@ public class TowerBehaviour : MonoBehaviour
         {
             Debug.LogError("TOWERS: No damage class attached to given tower!");
         }
-
         else
         {
             CurrentDamageMethodClass.Init(Damage, FireRate);
@@ -102,6 +108,57 @@ public class TowerBehaviour : MonoBehaviour
     {
         ElementPriorityFilter = newFilter;
         Debug.Log($"TowerBehaviour: Filtro de elemento cambiado a {newFilter}");
+    }
+
+    /// <summary>
+    /// Verifica si se puede aplicar la mejora (según el estado actual y la mejora solicitada)
+    /// </summary>
+    public bool CanApplyUpgrade(TowerUpgrade upgrade)
+    {
+        if (upgrade == null) return false;
+
+        switch (upgrade.ResultingState)
+        {
+            case UpgradeState.A1:
+                return CurrentUpgradeState == UpgradeState.None;
+            case UpgradeState.A2:
+                return CurrentUpgradeState == UpgradeState.A1;
+            case UpgradeState.B1:
+                return CurrentUpgradeState == UpgradeState.None;
+            case UpgradeState.B2:
+                return CurrentUpgradeState == UpgradeState.B1;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Aplica la mejora a la torre (no gestiona el pago; asume que ya se descontó)
+    /// </summary>
+    public void ApplyUpgrade(TowerUpgrade upgrade)
+    {
+        if (upgrade == null) return;
+        if (!CanApplyUpgrade(upgrade))
+        {
+            Debug.LogWarning("TowerBehaviour: No se puede aplicar esta mejora en el estado actual.");
+            return;
+        }
+
+        // Aplicar modificadores
+        Damage *= upgrade.DamageMultiplier;
+        FireRate *= upgrade.FireRateMultiplier;
+        Range += upgrade.RangeBonus;
+
+        // Asegurar que el método de daño use los nuevos valores
+        CurrentDamageMethodClass?.Init(Damage, FireRate);
+
+        // Actualizar coste invertido
+        AddInvestedCost(upgrade.Cost);
+
+        // Actualizar estado
+        CurrentUpgradeState = upgrade.ResultingState;
+
+        Debug.Log($"TowerBehaviour: Upgrade aplicado: {upgrade.UpgradeName}. Nuevo daño {Damage:F1}, cadencia {FireRate:F2}, rango {Range:F1}");
     }
 
     void OnDrawGizmosSelected()
