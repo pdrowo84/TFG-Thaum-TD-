@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5cc340d9d604ee4391b7578527b7ee0, type: 3}
+  m_Name: RockUpgradePath
+  m_EditorClassIdentifier: 
+  BranchA:
+  - {fileID: 11400000, guid: 074183b03ed797f4db23f48218f45df9, type: 2}
+  - {fileID: 11400000, guid: 29e91fc352a637e4f91c1cc953fba74b, type: 2}
+  BranchB:
+  - {fileID: 11400000, guid: c78774c2170bfc04e9cee4767f2d3df2, type: 2}
+  - {fileID: 11400000, guid: 44fafc5161e41bc44b86c0455bf7976e, type: 2}

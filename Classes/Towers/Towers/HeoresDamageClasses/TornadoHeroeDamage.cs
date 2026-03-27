@@ -35,7 +35,17 @@ public class TornadoHeroeDamage : MonoBehaviour, IDamageMethod
                 StandardBullet bulletScript = bullet.GetComponent<StandardBullet>();
                 if (bulletScript != null)
                 {
-                    bulletScript.Init(Target, GetComponent<TowerBehaviour>().Damage, GetComponent<TowerBehaviour>().DamageElement);
+                    var tower = GetComponent<TowerBehaviour>();
+                    if (tower != null)
+                    {
+                        // Pasar también la penetración de armadura como cuarto parámetro
+                        bulletScript.Init(Target, tower.Damage, tower.DamageElement, tower.ArmorPenetration);
+                    }
+                    else
+                    {
+                        // Fallback: si no hay TowerBehaviour, pasar 0 de penetración
+                        bulletScript.Init(Target, GetComponent<TowerBehaviour>().Damage, GetComponent<TowerBehaviour>().DamageElement, 0f);
+                    }
                 }
             }
 

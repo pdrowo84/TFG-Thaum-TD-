@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Collections;
 using static ElementDamageType;
 
-
-
 public class FireTriggerManager : MonoBehaviour
 {
     [SerializeField] private FlameThrowerDamage BaseClass;
@@ -26,7 +24,8 @@ public class FireTriggerManager : MonoBehaviour
             }
             ElementType damageType = tower.DamageElement;
 
-            Effect FlameEffect = new Effect("Fire", BaseClass.FireRate, BaseClass.Damage, 5f, damageType);
+            float burnDuration = tower.FlameBurnDuration;
+            Effect FlameEffect = new Effect("Fire", BaseClass.FireRate, BaseClass.Damage, burnDuration, damageType);
             ApplyEffectData EffectData = new ApplyEffectData(EntitySummoner.EnemyTransformPairs[other.transform.parent], FlameEffect);
             GameLoopManager.EnqueueEffectToApply(EffectData);
         }

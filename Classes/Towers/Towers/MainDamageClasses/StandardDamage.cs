@@ -17,7 +17,7 @@ public class StandardDamage : MonoBehaviour, IDamageMethod
     private float Delay;
     public void Init(float Damage, float FireRate)
     {
-       
+
         this.FireRate = FireRate;
         Delay = 1f / FireRate;
     }
@@ -39,13 +39,15 @@ public class StandardDamage : MonoBehaviour, IDamageMethod
                 StandardBullet bulletScript = bullet.GetComponent<StandardBullet>();
                 if (bulletScript != null)
                 {
-                    bulletScript.Init(Target, GetComponent<TowerBehaviour>().Damage, GetComponent<TowerBehaviour>().DamageElement);
+                    var tower = GetComponent<TowerBehaviour>();
+                    float towerPen = tower != null ? tower.ArmorPenetration : 0f;
+                    bulletScript.Init(Target, tower.Damage, tower.DamageElement, towerPen);
                 }
             }
 
             Delay = 1f / FireRate;
         }
-        
+
     }
 
 }

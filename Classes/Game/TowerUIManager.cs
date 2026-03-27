@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -143,6 +144,7 @@ public class TowerUIManager : MonoBehaviour
         TargetingDropdown.AddOptions(options);
     }
 
+    // (Se muestra únicamente la parte modificada: ShowTowerInfo + nueva coroutine)
     public void ShowTowerInfo(TowerBehaviour tower)
     {
         if (TowerInfoPanel == null) return;
@@ -196,13 +198,25 @@ public class TowerUIManager : MonoBehaviour
         // Mostrar UI de upgrades (o ocultar panel si no hay UI)
         if (UpgradeUI != null)
         {
-            UpgradeUI.ShowForTower(tower);
+            // Ejecutar ShowForTower en el siguiente frame para asegurar que
+            // el GameObject/Canvas del panel ya esté completamente activo y layout estabilizado.
+            StopCoroutine("ShowUpgradeUINextFrame");
+            StartCoroutine(ShowUpgradeUINextFrame(tower));
         }
         else if (UpgradePanel != null)
         {
             UpgradePanel.SetActive(false);
         }
+    }
 
+    private IEnumerator ShowUpgradeUINextFrame(TowerBehaviour tower)
+    {
+        // Esperar fin de frame permite a Unity activar objetos y recalcular layouts
+        // antes de que el UpgradeUI instancie/forceje el layout.
+        yield return null;
+
+        if (UpgradeUI != null)
+            UpgradeUI.ShowForTower(tower);
     }
 
     /// <summary>

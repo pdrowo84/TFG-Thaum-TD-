@@ -22,6 +22,9 @@ public class Enemy : MonoBehaviour
     public int MoneyReward;
     public bool IsDead = false;
 
+    // Guardamos la velocidad base para recomponerla cuando los efectos expiren
+    public float BaseSpeed;
+
     public void Init()
     {
         ActiveEffects = new List<Effect>();
@@ -30,7 +33,9 @@ public class Enemy : MonoBehaviour
         Health = MaxHealth;
         transform.position = GameLoopManager.NodePositions[0];
         NodeIndex = 0;
-       
+
+        BaseSpeed = Speed;
+
     }
 
     [System.Serializable]
@@ -54,10 +59,10 @@ public class Enemy : MonoBehaviour
                 if (ActiveEffects[i].DamageDelay > 0f)
                 {
                     ActiveEffects[i].DamageDelay -= Time.deltaTime;
-                    }
+                }
                 else
                 {
-                    GameLoopManager.EnqueueDamageData(new EnemyDamageData(this, ActiveEffects[i].Damage, 1f, ActiveEffects[i].DamageElement));
+                    GameLoopManager.EnqueueDamageData(new EnemyDamageData(this, ActiveEffects[i].Damage, 1f, ActiveEffects[i].DamageElement, 0f));
                     ActiveEffects[i].DamageDelay = 1f / ActiveEffects[i].DamageRate;
                 }
 
@@ -70,6 +75,20 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log($"[Efecto] {name}: {eliminados} efecto(s) expirado(s) y eliminado(s).");
         }
+
+        // Recalcular velocidad actual como BaseSpeed * producto de SpeedMultiplier de efectos activos
+        float speedMul = 1f;
+        if (ActiveEffects != null && ActiveEffects.Count > 0)
+        {
+            foreach (var eff in ActiveEffects)
+            {
+                // sólo efectos con SpeedMultiplier != 1 influyen
+                if (eff.SpeedMultiplier != 1f)
+                    speedMul *= eff.SpeedMultiplier;
+            }
+        }
+
+        Speed = BaseSpeed * speedMul;
     }
     public float GetElementalMultiplier(ElementType attackElement)
     {

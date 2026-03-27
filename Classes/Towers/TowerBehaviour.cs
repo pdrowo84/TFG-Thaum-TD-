@@ -17,6 +17,36 @@ public class TowerBehaviour : MonoBehaviour
     public float Range;
     public int SummonCost;
 
+
+    // Nueva: penetración de armadura (0 = ninguna, 0.5 = 50% de la resistencia ignorada, 1 = ignora toda la resistencia)
+    [Tooltip("Porcentaje de penetración de armadura (0-1). Ej: 0.5 = ignora 50% de la resistencia del enemigo)")]
+    [Range(0f, 1f)]
+    public float ArmorPenetration = 0f;
+
+    // Nueva: número de rebotes del láser que tiene la torre (0 = sin rebote)
+    [Tooltip("Número de rebotes del láser (0 = sin rebote)")]
+    [Range(0, 5)]
+    public int LaserBounceCount = 0;
+
+    // --- Valores específicos para el lanzamisiles ---
+    [Header("Missile Settings")]
+    [Tooltip("Radio de explosión para el lanzamisiles")]
+    public float MissileExplosionRadius = 1f;
+
+    [Tooltip("Porcentaje de ralentización aplicado por el lanzamisiles (0-1). Ej: 0.2 = -20% velocidad")]
+    [Range(0f, 1f)]
+    public float MissileSlowAmount = 0f;
+
+    [Tooltip("Duración de la ralentización aplicada por el lanzamisiles (segundos)")]
+    public float MissileSlowDuration = 0f;
+    // ----------------------------------------------
+
+    // --- Valores específicos para la lanzallamas ---
+    [Header("Flamethrower Settings")]
+    [Tooltip("Duración por defecto (s) del efecto de quemadura aplicado por la lanzallamas")]
+    public float FlameBurnDuration = 5f;
+    // ----------------------------------------------
+
     // Sistema de venta
     [HideInInspector]
     public int TotalInvestedCost;
@@ -62,6 +92,20 @@ public class TowerBehaviour : MonoBehaviour
             CurrentDamageMethodClass.Init(Damage, FireRate);
         }
 
+        // Ajustes por defecto para torres de Agua:
+        // poca potencia, mucha cadencia y alta penetración de armadura
+        if (DamageElement == ElementDamageType.ElementType.Water)
+        {
+            // Estos valores se aplican sobre los valores configurados (puedes ajustar los multiplicadores)
+            Damage *= 0.6f;              // menos daño
+            FireRate *= 1.5f;           // más velocidad de disparo
+            ArmorPenetration = Mathf.Clamp(ArmorPenetration, 0f, 1f);
+            if (ArmorPenetration < 0.4f) // si no se ha configurado, dar un valor alto por defecto
+                ArmorPenetration = 0.5f;
+            Debug.Log($"TowerBehaviour: Torre Agua ajustada -> Damage={Damage}, FireRate={FireRate}, ArmorPenetration={ArmorPenetration}");
+            CurrentDamageMethodClass.Init(Damage, FireRate); // reinicializar con nuevos valores
+        }
+
         Delay = 1 / FireRate;
     }
 
@@ -93,7 +137,7 @@ public class TowerBehaviour : MonoBehaviour
     }
 
     /// <summary>
-    /// Cambia el modo de targeting de la torre
+    /// Cambia el modo de targeting de la torre (no gestiona el pago; asume que ya se descontó)
     /// </summary>
     public void SetTargetingMode(TowerTargeting.TargetType newMode)
     {
@@ -149,6 +193,28 @@ public class TowerBehaviour : MonoBehaviour
         FireRate *= upgrade.FireRateMultiplier;
         Range += upgrade.RangeBonus;
 
+        // Aplicar bonus de penetración de armadura (se suma y se clampa entre 0 y 1)
+        ArmorPenetration += upgrade.ArmorPenetrationBonus;
+        ArmorPenetration = Mathf.Clamp(ArmorPenetration, 0f, 1f);
+
+        // Aplicar bonus de rebotes para el láser (rama B)
+        LaserBounceCount += upgrade.BounceCountBonus;
+        LaserBounceCount = Mathf.Clamp(LaserBounceCount, 0, 5);
+
+        // Aplicar mejoras específicas para el lanzamisiles
+        MissileExplosionRadius += upgrade.ExplosionRadiusBonus;
+        MissileExplosionRadius = Mathf.Max(0f, MissileExplosionRadius);
+
+        MissileSlowAmount += upgrade.SlowAmountBonus;
+        MissileSlowAmount = Mathf.Clamp01(MissileSlowAmount);
+
+        MissileSlowDuration += upgrade.SlowDurationBonus;
+        if (MissileSlowDuration < 0f) MissileSlowDuration = 0f;
+
+        // Aplicar mejoras específicas para la lanzallamas (duración de quemadura)
+        FlameBurnDuration += upgrade.BurnDurationBonus;
+        if (FlameBurnDuration < 0f) FlameBurnDuration = 0f;
+
         // Asegurar que el método de daño use los nuevos valores
         CurrentDamageMethodClass?.Init(Damage, FireRate);
 
@@ -158,7 +224,7 @@ public class TowerBehaviour : MonoBehaviour
         // Actualizar estado
         CurrentUpgradeState = upgrade.ResultingState;
 
-        Debug.Log($"TowerBehaviour: Upgrade aplicado: {upgrade.UpgradeName}. Nuevo daño {Damage:F1}, cadencia {FireRate:F2}, rango {Range:F1}");
+        Debug.Log($"TowerBehaviour: Upgrade aplicado: {upgrade.UpgradeName}. Nuevo daño {Damage:F1}, cadencia {FireRate:F2}, rango {Range:F1}, penetración {ArmorPenetration:F2}, rebotes láser {LaserBounceCount}, missileRadius {MissileExplosionRadius:F2}, slow {MissileSlowAmount:F2}@{MissileSlowDuration:F1}s, burnDuration {FlameBurnDuration:F1}s");
     }
 
     void OnDrawGizmosSelected()

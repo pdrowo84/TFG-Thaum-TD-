@@ -7,12 +7,14 @@ public class StandardBullet : MonoBehaviour
     private float speed = 20f;
     private float damage;
     private ElementType damageType;
+    private float penetration; // nueva: penetración de armadura de la torre que disparó
 
-    public void Init(Enemy target, float damage, ElementType damageType)
+    public void Init(Enemy target, float damage, ElementType damageType, float penetration)
     {
         this.target = target;
         this.damage = damage;
         this.damageType = damageType;
+        this.penetration = Mathf.Clamp01(penetration);
     }
 
     void Update()
@@ -40,7 +42,7 @@ public class StandardBullet : MonoBehaviour
     void HitTarget()
     {
         // Encola el daño para que lo procese GameLoopManager (respetando resistencias/inmunidades)
-        GameLoopManager.EnqueueDamageData(new EnemyDamageData(target, damage, target.DamageResistance, damageType));
+        GameLoopManager.EnqueueDamageData(new EnemyDamageData(target, damage, target.DamageResistance, damageType, penetration));
         Destroy(gameObject);
     }
 }

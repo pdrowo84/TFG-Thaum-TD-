@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5cc340d9d604ee4391b7578527b7ee0, type: 3}
+  m_Name: FireUpgradePath
+  m_EditorClassIdentifier: 
+  BranchA:
+  - {fileID: 11400000, guid: 6fad45a05603bed439ca8759514aa917, type: 2}
+  - {fileID: 11400000, guid: 2841e685d036077419bb114852a661a7, type: 2}
+  BranchB:
+  - {fileID: 11400000, guid: e978d14a89de4ab438b8030abfa27f1b, type: 2}
+  - {fileID: 11400000, guid: c44aa26930aa637419d92fa198f76aa9, type: 2}

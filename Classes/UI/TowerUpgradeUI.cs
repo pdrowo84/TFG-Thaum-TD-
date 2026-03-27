@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -26,9 +27,32 @@ public class TowerUpgradeUI : MonoBehaviour
     private CanvasGroup branchACanvasGroup;
     private CanvasGroup branchBCanvasGroup;
 
+    // Inicialización perezosa para evitar race conditions cuando el panel se activa y ShowForTower
+    // se llama antes de que Unity ejecute Start() en este componente.
+    private bool isInitialized = false;
+
     void Start()
     {
-        playerStats = FindObjectOfType<PlayerStats>();
+        // Ejecutar la inicialización normal y mantener el panel oculto por defecto.
+        EnsureInitialized();
+        Hide();
+    }
+
+    private void EnsureCanvasGroup(ref CanvasGroup cg, RectTransform container)
+    {
+        if (container == null) return;
+        cg = container.GetComponent<CanvasGroup>();
+        if (cg == null) cg = container.gameObject.AddComponent<CanvasGroup>();
+    }
+
+    // Inicialización segura para ejecutar desde Start o desde ShowForTower si Start no ha corrido.
+    private void EnsureInitialized()
+    {
+        if (isInitialized) return;
+        isInitialized = true;
+
+        // Localizar PlayerStats (puede no existir en Start)
+        playerStats = playerStats ?? FindObjectOfType<PlayerStats>();
 
         // Auto-asignar contenedores si no están asignados y existen hijos con esos nombres
         if (BranchAContainer == null)
@@ -62,27 +86,17 @@ public class TowerUpgradeUI : MonoBehaviour
             Debug.LogError("TowerUpgradeUI: UpgradeButtonPrefab no asignado (arrastra el prefab desde Assets).");
         else
             Debug.Log($"TowerUpgradeUI: UpgradeButtonPrefab asignado -> {UpgradeButtonPrefab.name}");
-
-        Hide();
-    }
-
-    private void EnsureCanvasGroup(ref CanvasGroup cg, RectTransform container)
-    {
-        if (container == null) return;
-        cg = container.GetComponent<CanvasGroup>();
-        if (cg == null) cg = container.gameObject.AddComponent<CanvasGroup>();
     }
 
     public void ShowForTower(TowerBehaviour tower)
     {
         if (tower == null) return;
 
+        // Asegurar inicialización aunque Start() no haya corrido aún
+        EnsureInitialized();
+
         // Reintentar localizar PlayerStats por si Start se ejecutó antes de su creación
         playerStats = playerStats ?? FindObjectOfType<PlayerStats>();
-
-        // Asegurar CanvasGroup en caso de que los contenedores se asignen después de Start
-        EnsureCanvasGroup(ref branchACanvasGroup, BranchAContainer);
-        EnsureCanvasGroup(ref branchBCanvasGroup, BranchBContainer);
 
         currentTower = tower;
         ClearButtons();
@@ -94,29 +108,43 @@ public class TowerUpgradeUI : MonoBehaviour
             return;
         }
 
+        // Asegurar que el GameObject del panel y su Canvas padre estén activos antes de crear controles.
+        // Esto evita problemas donde la UI no mide correctamente elementos hijos si el canvas estaba inactivo.
+        if (!gameObject.activeInHierarchy)
+            gameObject.SetActive(true);
+
+        var parentCanvas = GetComponentInParent<Canvas>();
+        if (parentCanvas != null && !parentCanvas.gameObject.activeInHierarchy)
+            parentCanvas.gameObject.SetActive(true);
+
         // Asegurar que los contenedores estén activos para que LayoutGroup los mida correctamente
         if (BranchAContainer != null) BranchAContainer.gameObject.SetActive(true);
         if (BranchBContainer != null) BranchBContainer.gameObject.SetActive(true);
 
-        // Crear un solo botón por rama
+        // Forzar actualización del Canvas/Layouts antes de instanciar botones
+        Canvas.ForceUpdateCanvases();
+        if (parentCanvas != null)
+        {
+            var parentRect = parentCanvas.GetComponent<RectTransform>();
+            if (parentRect != null) UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
+        }
+
+        // Crear un solo botón por rama (ahora en contexto de Canvas activo)
         CreateBranchButton(tower, tower.UpgradePath.BranchA, BranchAContainer, isBranchA: true);
         CreateBranchButton(tower, tower.UpgradePath.BranchB, BranchBContainer, isBranchA: false);
 
-        gameObject.SetActive(true);
-
-        // En lugar de actualizar inmediatamente, esperar un frame para evitar condiciones de carrera
-        StopAllCoroutines();
-        StartCoroutine(RebuildAndRefresh());
+        // Forzar actualización tras creación y aplicar estados
+        Canvas.ForceUpdateCanvases();
+        RebuildAndRefreshImmediate();
     }
 
-    // Espera un frame para dejar que el Canvas y Layout se estabilicen, luego refresca el estado
-    private IEnumerator RebuildAndRefresh()
+    // Actualiza layout y estado inmediatamente (sin esperar frames)
+    private void RebuildAndRefreshImmediate()
     {
-        yield return null; // espera un frame
-
         Canvas.ForceUpdateCanvases();
-        if (BranchAContainer != null) LayoutRebuilder.ForceRebuildLayoutImmediate(BranchAContainer);
-        if (BranchBContainer != null) LayoutRebuilder.ForceRebuildLayoutImmediate(BranchBContainer);
+
+        if (BranchAContainer != null) UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(BranchAContainer);
+        if (BranchBContainer != null) UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(BranchBContainer);
 
         // Asegurar CanvasGroup de nuevo (por si se añadieron/desasignaron dinámicamente)
         EnsureCanvasGroup(ref branchACanvasGroup, BranchAContainer);
@@ -142,6 +170,15 @@ public class TowerUpgradeUI : MonoBehaviour
         {
             Debug.Log("TowerUpgradeUI: No se encontró Canvas padre para TowerUpgradeUI (botones deben estar dentro de un Canvas).");
         }
+    }
+
+    // Espera un frame para dejar que el Canvas y Layout se estabilicen, luego refresca el estado
+    // Mantengo la coroutine para compatibilidad si en algún flujo se desea esperar un frame.
+    private IEnumerator RebuildAndRefresh()
+    {
+        yield return null; // espera un frame
+
+        RebuildAndRefreshImmediate();
     }
 
     private void CreateBranchButton(TowerBehaviour tower, TowerUpgrade[] branchUpgrades, RectTransform parent, bool isBranchA)

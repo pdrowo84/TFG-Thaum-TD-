@@ -977,8 +977,8 @@ GameObject:
   m_Component:
   - component: {fileID: 683812974476639183}
   - component: {fileID: 8590965139152524386}
-  - component: {fileID: 1607294608411862315}
   - component: {fileID: 3742953341573791239}
+  - component: {fileID: 1607294608411862315}
   m_Layer: 3
   m_Name: Missile
   m_TagString: NoPlace
@@ -1023,10 +1023,39 @@ MonoBehaviour:
   Target: {fileID: 0}
   TowerPivot: {fileID: 233224727403498134}
   HasHeroBuff: 0
-  Damage: 5
+  Damage: 1
   FireRate: 0.5
   Range: 5
   SummonCost: 350
+  ArmorPenetration: 0
+  LaserBounceCount: 0
+  MissileExplosionRadius: 1
+  MissileSlowAmount: 0.425
+  MissileSlowDuration: 2
+  TotalInvestedCost: 0
+  SellRefundPercentage: 70
+  TargetingMode: 0
+  ElementPriorityFilter: 0
+  UpgradePath: {fileID: 11400000, guid: 74ef3f3f1b71510408c55e2d0c99b743, type: 2}
+  CurrentUpgradeState: 0
+--- !u!114 &3742953341573791239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8092793531161794173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc75de40359dfce4798f7de56c1cba04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EnemiesLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  MissileSystem: {fileID: 5529788998372214932}
+  TowerHead: {fileID: 2076077186868044166}
+  Damage: 3
 --- !u!65 &1607294608411862315
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1048,24 +1077,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.8, y: 1.85, z: 1.8}
   m_Center: {x: 0, y: 0.97, z: -0.07}
---- !u!114 &3742953341573791239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8092793531161794173}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc75de40359dfce4798f7de56c1cba04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EnemiesLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  MissileSystem: {fileID: 5529788998372214932}
-  TowerHead: {fileID: 2076077186868044166}
-  Damage: 0
 --- !u!1001 &4209544219199867639
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -412,10 +412,18 @@ MonoBehaviour:
   Target: {fileID: 0}
   TowerPivot: {fileID: 7903021394978673118}
   HasHeroBuff: 0
-  Damage: 0.2
+  Damage: 0.01
   FireRate: 25
   Range: 5
   SummonCost: 400
+  ArmorPenetration: 0
+  LaserBounceCount: 0
+  TotalInvestedCost: 0
+  SellRefundPercentage: 70
+  TargetingMode: 0
+  ElementPriorityFilter: 0
+  UpgradePath: {fileID: 11400000, guid: c7970f899821e1c4baf41041dbf08f85, type: 2}
+  CurrentUpgradeState: 0
 --- !u!114 &6886660480967772552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -430,6 +438,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LaserPivot: {fileID: 3055252574743879542}
   LaserRenderer: {fileID: 2498560192274063813}
+  BounceDamageMultiplier: 0.6
+  MaxBounceDistance: 20
 --- !u!65 &3247717759348455469
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -531,9 +541,11 @@ LineRenderer:
   m_Positions:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
+  - {x: 0, y: 0, z: 1}
+  - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.1
+    widthMultiplier: 0.49117258
     widthCurve:
       serializedVersion: 2
       m_Curve:

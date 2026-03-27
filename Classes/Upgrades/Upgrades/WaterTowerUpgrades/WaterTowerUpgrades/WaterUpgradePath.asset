@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5cc340d9d604ee4391b7578527b7ee0, type: 3}
+  m_Name: WaterUpgradePath
+  m_EditorClassIdentifier: 
+  BranchA:
+  - {fileID: 11400000, guid: c71a262a0fb1cc14b9e8eab9a068592c, type: 2}
+  - {fileID: 11400000, guid: c406281347b4bc74aa1ff7ad061abc1e, type: 2}
+  BranchB:
+  - {fileID: 11400000, guid: 1eed29d9c08c640418746a1b667fe342, type: 2}
+  - {fileID: 11400000, guid: d44a44d9088949840ad27e90c2e5a494, type: 2}

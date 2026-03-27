@@ -150,7 +150,7 @@ public class GameLoopManager : MonoBehaviour
 
             foreach (TowerBehaviour tower in TowersInGame)
             {
-                tower.Target = TowerTargeting.GetTarget(tower, tower.TargetingMode); 
+                tower.Target = TowerTargeting.GetTarget(tower, tower.TargetingMode);
                 tower.Tick();
             }
 
@@ -195,8 +195,9 @@ public class GameLoopManager : MonoBehaviour
                     if (CurrentDamageData.DamageElement != ElementType.None)
                         multiplier = CurrentDamageData.TargetedEnemy.GetElementalMultiplier(CurrentDamageData.DamageElement);
 
-                    // Aplica el daño con el multiplicador elemental
-                    CurrentDamageData.TargetedEnemy.Health -= (CurrentDamageData.TotalDamage * multiplier) / CurrentDamageData.Resistance;
+                    // Aplica el daño con el multiplicador elemental y la penetración
+                    float effectiveResistance = Mathf.Max(0.1f, CurrentDamageData.Resistance * (1f - CurrentDamageData.Penetration));
+                    CurrentDamageData.TargetedEnemy.Health -= (CurrentDamageData.TotalDamage * multiplier) / effectiveResistance;
 
                     if (CurrentDamageData.TargetedEnemy.Health <= 0f && !CurrentDamageData.TargetedEnemy.IsDead)
                     {
@@ -334,7 +335,8 @@ public class GameLoopManager : MonoBehaviour
 
 public class Effect
 {
-    public Effect(string effectName, float damageRate, float damage, float expireTime, ElementType damageElement)
+    // Añadido SpeedMultiplier para soporte de ralentizaciones (1 = sin cambio, 0.8 = 20% más lento)
+    public Effect(string effectName, float damageRate, float damage, float expireTime, ElementType damageElement, float speedMultiplier = 1f)
     {
 
         ExpireTime = expireTime;
@@ -342,6 +344,7 @@ public class Effect
         DamageRate = damageRate;
         Damage = damage;
         DamageElement = damageElement;
+        SpeedMultiplier = speedMultiplier;
 
     }
 
@@ -353,6 +356,8 @@ public class Effect
     public float DamageDelay;
 
     public float ExpireTime;
+
+    public float SpeedMultiplier = 1f;
 }
 
 public struct ApplyEffectData
@@ -368,18 +373,20 @@ public struct ApplyEffectData
 }
 public struct EnemyDamageData
 {
-    public EnemyDamageData(Enemy target, float damage, float resistance, ElementType damageElement)
+    public EnemyDamageData(Enemy target, float damage, float resistance, ElementType damageElement, float penetration = 0f)
     {
         DamageElement = damageElement;
         TargetedEnemy = target;
         TotalDamage = damage;
         Resistance = resistance;
+        Penetration = Mathf.Clamp01(penetration);
     }
 
     public ElementType DamageElement;
     public Enemy TargetedEnemy;
     public float TotalDamage;
     public float Resistance;
+    public float Penetration; // 0..1 porcentaje de resistencia ignorada
 }
 public struct MoveEnemyJob : IJobParallelForTransform
 {
@@ -408,3 +415,4 @@ public struct MoveEnemyJob : IJobParallelForTransform
 
     }
 }
+
