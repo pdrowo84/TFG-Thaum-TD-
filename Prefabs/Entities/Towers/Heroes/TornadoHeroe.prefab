@@ -118,8 +118,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4163126293477806009}
   - component: {fileID: 4257525589118416666}
-  - component: {fileID: 8741314485319920161}
   - component: {fileID: 287180137784037823}
+  - component: {fileID: 8741314485319920161}
   - component: {fileID: -3077957878964217363}
   m_Layer: 3
   m_Name: TornadoHeroe
@@ -168,6 +168,41 @@ MonoBehaviour:
   FireRate: 3
   Range: 5
   SummonCost: 400
+  ArmorPenetration: 0
+  LaserBounceCount: 0
+  MissileExplosionRadius: 1
+  MissileSlowAmount: 0
+  MissileSlowDuration: 0
+  FlameBurnDuration: 5
+  TotalInvestedCost: 0
+  SellRefundPercentage: 70
+  TargetingMode: 0
+  ElementPriorityFilter: 0
+  UpgradePath: {fileID: 0}
+  CurrentUpgradeState: 0
+--- !u!114 &287180137784037823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943061094203421269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d85d7b7abed61a344a8b8866a69faaa5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BuffRadius: 5
+  DamageBuff: 1.3
+  RequiredElement: 4
+  AbilityCooldown: 30
+  TornadoPrefab: {fileID: 905197000048422588, guid: b4fe1417edd1c094d8b1dfb03f250630, type: 3}
+  TornadoSpawnPoint: {fileID: 0}
+  TornadoDuration: 5
+  TornadoDamageMultiplier: 3
+  ShowPassiveRadius: 1
+  PassiveRadiusColor: {r: 0.7809719, g: 0.8490566, b: 0.8490566, a: 0.5}
+  PassiveLineWidth: 0.2
 --- !u!65 &8741314485319920161
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -189,29 +224,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.8, y: 1.85, z: 1.8}
   m_Center: {x: 0, y: 0.97, z: -0.07}
---- !u!114 &287180137784037823
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943061094203421269}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d85d7b7abed61a344a8b8866a69faaa5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  BuffRadius: 5
-  DamageBuff: 2
-  RequiredElement: 4
-  AbilityCooldown: 30
-  TornadoPrefab: {fileID: 905197000048422588, guid: b4fe1417edd1c094d8b1dfb03f250630, type: 3}
-  TornadoSpawnPoint: {fileID: 0}
-  TornadoDuration: 5
-  TornadoDamageMultiplier: 3
-  ShowPassiveRadius: 1
-  PassiveRadiusColor: {r: 0.7809719, g: 0.8490566, b: 0.8490566, a: 0.5}
-  PassiveLineWidth: 0.2
 --- !u!114 &-3077957878964217363
 MonoBehaviour:
   m_ObjectHideFlags: 0

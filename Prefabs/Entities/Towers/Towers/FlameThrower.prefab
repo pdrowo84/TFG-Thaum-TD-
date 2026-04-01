@@ -843,10 +843,10 @@ MonoBehaviour:
   Target: {fileID: 0}
   TowerPivot: {fileID: 2542634948385136272}
   HasHeroBuff: 0
-  Damage: 1
+  Damage: 10
   FireRate: 1
-  Range: 5
-  SummonCost: 400
+  Range: 5.3
+  SummonCost: 175
   ArmorPenetration: 0
   LaserBounceCount: 0
   MissileExplosionRadius: 1

@@ -134,6 +134,21 @@ public class EntitySummoner : MonoBehaviour
     {
         if (EnemyToRemove == null) return;
 
+        // Limpiar efectos y restaurar velocidad antes de enpoolar
+        try
+        {
+            if (EnemyToRemove.ActiveEffects != null)
+                EnemyToRemove.ActiveEffects.Clear();
+        }
+        catch { /* ignore safety */ }
+
+        // Restaurar velocidad a la base original por si quedó alterada
+        try
+        {
+            EnemyToRemove.Speed = EnemyToRemove.BaseSpeed;
+        }
+        catch { /* ignore safety */ }
+
         if (EnemyObjectPools != null && EnemyObjectPools.ContainsKey(EnemyToRemove.ID))
         {
             EnemyObjectPools[EnemyToRemove.ID].Enqueue(EnemyToRemove);

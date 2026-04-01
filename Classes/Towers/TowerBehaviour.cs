@@ -92,19 +92,7 @@ public class TowerBehaviour : MonoBehaviour
             CurrentDamageMethodClass.Init(Damage, FireRate);
         }
 
-        // Ajustes por defecto para torres de Agua:
-        // poca potencia, mucha cadencia y alta penetración de armadura
-        if (DamageElement == ElementDamageType.ElementType.Water)
-        {
-            // Estos valores se aplican sobre los valores configurados (puedes ajustar los multiplicadores)
-            Damage *= 0.6f;              // menos daño
-            FireRate *= 1.5f;           // más velocidad de disparo
-            ArmorPenetration = Mathf.Clamp(ArmorPenetration, 0f, 1f);
-            if (ArmorPenetration < 0.4f) // si no se ha configurado, dar un valor alto por defecto
-                ArmorPenetration = 0.5f;
-            Debug.Log($"TowerBehaviour: Torre Agua ajustada -> Damage={Damage}, FireRate={FireRate}, ArmorPenetration={ArmorPenetration}");
-            CurrentDamageMethodClass.Init(Damage, FireRate); // reinicializar con nuevos valores
-        }
+       
 
         Delay = 1 / FireRate;
     }

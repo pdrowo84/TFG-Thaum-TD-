@@ -17,6 +17,12 @@ MonoBehaviour:
   Icon: {fileID: 0}
   Cost: 100
   DamageMultiplier: 1
-  FireRateMultiplier: 1.25
+  FireRateMultiplier: 1.3
   RangeBonus: 0
+  ArmorPenetrationBonus: 0
+  BounceCountBonus: 0
+  SlowAmountBonus: 0
+  SlowDurationBonus: 0
+  ExplosionRadiusBonus: 0
+  BurnDurationBonus: 0
   ResultingState: 3

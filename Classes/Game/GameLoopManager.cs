@@ -1,10 +1,10 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Collections;
-using UnityEngine.Jobs;
 using Unity.Jobs;
-using UnityEngine.UIElements;
+using UnityEngine;
+using UnityEngine.Jobs;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static ElementDamageType;
@@ -31,6 +31,14 @@ public class GameLoopManager : MonoBehaviour
 
     public UnityEngine.UI.Toggle speedToggle;
 
+    [Header("UI")]
+    [Tooltip("Texto que mostrará la oleada actual (ej. 3/20)")]
+    public TextMeshProUGUI WaveText;
+
+    [Header("Enemies")]
+    [Tooltip("Velocidad angular en grados/seg que usan los enemigos para rotar hacia su dirección de movimiento")]
+    public float EnemyRotationSpeed = 720f;
+
     private void Start()
     {
         EntitySummoner.Init();
@@ -40,7 +48,7 @@ public class GameLoopManager : MonoBehaviour
         currentWave = 0;
         waveInProgress = false;
 
-        PlayerStatistics = FindFirstObjectByType<PlayerStats>();
+        PlayerStatistics = FindObjectOfType<PlayerStats>();
         EffectsQueue = new Queue<ApplyEffectData>();
         DamageData = new Queue<EnemyDamageData>();
         TowersInGame = new List<TowerBehaviour>();
@@ -63,6 +71,8 @@ public class GameLoopManager : MonoBehaviour
             NodeDistances[i] = Vector3.Distance(NodePositions[i], NodePositions[i + 1]);
         }
 
+        // Inicializar texto de oleadas
+        UpdateWaveText();
 
         StartCoroutine(GameLoop());
 
@@ -120,7 +130,8 @@ public class GameLoopManager : MonoBehaviour
                 NodePositions = NodesToUse,
                 NodeIndex = NodeIndicies,
                 EnemySpeeds = EnemySpeeds,
-                DeltaTime = Time.deltaTime
+                DeltaTime = Time.deltaTime,
+                RotationSpeed = EnemyRotationSpeed
             };
 
             JobHandle MoveJobHandle = MoveJob.Schedule(EnemyAccess);
@@ -160,6 +171,14 @@ public class GameLoopManager : MonoBehaviour
                 for (int i = 0; i < EffectsQueue.Count; i++)
                 {
                     ApplyEffectData CurrentDamageData = EffectsQueue.Dequeue();
+
+                    // Evitar aplicar efectos a enemigos ya muertos o nulos (por pooling)
+                    if (CurrentDamageData.EnemyToAffect == null || CurrentDamageData.EnemyToAffect.IsDead)
+                    {
+                        Debug.Log($"GameLoopManager: Saltando efecto '{CurrentDamageData.EffectToApply.EffectName}' para enemigo nulo/muerto.");
+                        continue;
+                    }
+
                     Effect EffectDuplicate = CurrentDamageData.EnemyToAffect.ActiveEffects.Find(x => x.EffectName == CurrentDamageData.EffectToApply.EffectName);
 
                     if (EffectDuplicate == null)
@@ -190,6 +209,13 @@ public class GameLoopManager : MonoBehaviour
                 for (int i = 0; i < DamageData.Count; i++)
                 {
                     EnemyDamageData CurrentDamageData = DamageData.Dequeue();
+
+                    // Ignorar entradas para enemigos nulos o ya muertos (por pooling)
+                    if (CurrentDamageData.TargetedEnemy == null || CurrentDamageData.TargetedEnemy.IsDead)
+                    {
+                        Debug.Log("GameLoopManager: Saltando daño en cola para enemigo nulo/muerto.");
+                        continue;
+                    }
 
                     float multiplier = 1f;
                     if (CurrentDamageData.DamageElement != ElementType.None)
@@ -236,20 +262,103 @@ public class GameLoopManager : MonoBehaviour
         {
             Debug.Log("¡Todas las oleadas completadas!");
         }
+
+        // Actualizar UI después de intentar arrancar la siguiente ola
+        UpdateWaveText();
     }
 
     private IEnumerator SpawnWave(WaveData wave)
     {
         waveInProgress = true;
-        foreach (var enemyInfo in wave.EnemiesToSpawn)
+
+        // Actualizar indicador de oleada cuando la corrutina comienza (currentWave ya fue incrementado por StartNextWave)
+        UpdateWaveText();
+
+        if (wave == null || wave.EnemiesToSpawn == null || wave.EnemiesToSpawn.Length == 0)
         {
-            for (int i = 0; i < enemyInfo.Count; i++)
-            {
-                EnqueuedEnemyIDToSummon(enemyInfo.EnemyID);
-                yield return new WaitForSeconds(wave.SpawnInterval);
-            }
+            waveInProgress = false;
+            yield break;
         }
+
+        switch (wave.Mode)
+        {
+            case WaveData.SpawnMode.Sequential:
+                // Comportamiento original: por cada entrada spawnear su Count seguido
+                foreach (var enemyInfo in wave.EnemiesToSpawn)
+                {
+                    for (int i = 0; i < enemyInfo.Count; i++)
+                    {
+                        EnqueuedEnemyIDToSummon(enemyInfo.EnemyID);
+                        yield return new WaitForSeconds(wave.SpawnInterval);
+                    }
+                }
+                break;
+
+            case WaveData.SpawnMode.Interleaved:
+                // Round-robin: spawnea 1 de cada entrada por iteración hasta agotar todas
+                int entries = wave.EnemiesToSpawn.Length;
+                int[] remaining = new int[entries];
+                for (int e = 0; e < entries; e++) remaining[e] = Mathf.Max(0, wave.EnemiesToSpawn[e].Count);
+
+                bool anyLeft = true;
+                while (anyLeft)
+                {
+                    anyLeft = false;
+                    for (int e = 0; e < entries; e++)
+                    {
+                        if (remaining[e] > 0)
+                        {
+                            EnqueuedEnemyIDToSummon(wave.EnemiesToSpawn[e].EnemyID);
+                            remaining[e]--;
+                            yield return new WaitForSeconds(wave.SpawnInterval);
+                            anyLeft = true;
+                        }
+                    }
+                }
+                break;
+
+            case WaveData.SpawnMode.Randomized:
+                // Barajar la lista completa y spawnear en orden aleatorio
+                var pool = new System.Collections.Generic.List<int>();
+                foreach (var enemyInfo in wave.EnemiesToSpawn)
+                {
+                    for (int i = 0; i < enemyInfo.Count; i++)
+                        pool.Add(enemyInfo.EnemyID);
+                }
+
+                // Fisher-Yates shuffle
+                for (int i = pool.Count - 1; i > 0; i--)
+                {
+                    int j = UnityEngine.Random.Range(0, i + 1);
+                    int tmp = pool[i];
+                    pool[i] = pool[j];
+                    pool[j] = tmp;
+                }
+
+                for (int i = 0; i < pool.Count; i++)
+                {
+                    EnqueuedEnemyIDToSummon(pool[i]);
+                    yield return new WaitForSeconds(wave.SpawnInterval);
+                }
+                break;
+
+            default:
+                // Fallback seguro al comportamiento secuencial
+                foreach (var enemyInfo in wave.EnemiesToSpawn)
+                {
+                    for (int i = 0; i < enemyInfo.Count; i++)
+                    {
+                        EnqueuedEnemyIDToSummon(enemyInfo.EnemyID);
+                        yield return new WaitForSeconds(wave.SpawnInterval);
+                    }
+                }
+                break;
+        }
+
         waveInProgress = false;
+
+        // Actualizar indicador al terminar la oleada
+        UpdateWaveText();
     }
     public static void EnqueueEffectToApply(ApplyEffectData effectData)
     {
@@ -330,6 +439,24 @@ public class GameLoopManager : MonoBehaviour
         ResetGame();
         SceneManager.LoadScene(0);
     }
+
+    // Actualiza el TextMeshProUGUI que muestra la oleada actual
+    private void UpdateWaveText()
+    {
+        if (WaveText == null || Waves == null)
+            return;
+
+        int total = Waves.Count;
+
+        // Cuando no ha empezado ninguna ola currentWave == 0 y waveInProgress == false -> mostrar 0/total
+        // Cuando está en progreso o después de iniciar una ola, currentWave contiene el número de la ola en curso (1-based)
+        int displayWave = Mathf.Clamp(currentWave, 0, total);
+
+        // Si no hay oleadas configuradas, mostrar 0/0 por seguridad
+        WaveText.text = $"Oleada {displayWave}/{total}";
+    }
+
+
 }
 
 
@@ -400,19 +527,40 @@ public struct MoveEnemyJob : IJobParallelForTransform
     public NativeArray<float> EnemySpeeds;
 
     public float DeltaTime;
+
+    // Nueva: velocidad angular (grados/seg) para rotación suave hacia la dirección de movimiento
+    public float RotationSpeed;
+
     public void Execute(int index, TransformAccess transform)
     {
         if (NodeIndex[index] >= NodePositions.Length)
             return;
 
         Vector3 PositionToMove = NodePositions[NodeIndex[index]];
-        transform.position = Vector3.MoveTowards(transform.position, PositionToMove, EnemySpeeds[index] * DeltaTime);
+        Vector3 currentPos = transform.position;
 
-        if (transform.position == PositionToMove)
+        // Dirección hacia el objetivo
+        Vector3 dir = PositionToMove - currentPos;
+        float distToTarget = dir.magnitude;
+
+        // Mover hacia el objetivo respetando la velocidad
+        Vector3 newPos = Vector3.MoveTowards(currentPos, PositionToMove, EnemySpeeds[index] * DeltaTime);
+        transform.position = newPos;
+
+        // Rotar suavemente hacia la dirección de movimiento si hay separación
+        Vector3 moveDir = newPos - currentPos;
+        if (moveDir.sqrMagnitude > 0.000001f)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(moveDir.normalized);
+            // Rota hasta RotationSpeed * DeltaTime grados en este frame
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, RotationSpeed * DeltaTime);
+        }
+
+        // Si hemos alcanzado la posición objetivo, avanzamos al siguiente nodo
+        if (newPos == PositionToMove)
         {
             NodeIndex[index]++;
         }
 
     }
 }
-

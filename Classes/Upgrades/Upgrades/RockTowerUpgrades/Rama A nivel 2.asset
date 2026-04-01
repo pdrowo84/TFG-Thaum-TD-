@@ -15,13 +15,14 @@ MonoBehaviour:
   UpgradeName: Slow ++
   Description: 
   Icon: {fileID: 0}
-  Cost: 100
+  Cost: 200
   DamageMultiplier: 1
   FireRateMultiplier: 1
   RangeBonus: 0
   ArmorPenetrationBonus: 0
   BounceCountBonus: 0
-  SlowAmountBonus: 0.5
-  SlowDurationBonus: 3
+  SlowAmountBonus: 0.25
+  SlowDurationBonus: 2
   ExplosionRadiusBonus: 0
+  BurnDurationBonus: 0
   ResultingState: 2

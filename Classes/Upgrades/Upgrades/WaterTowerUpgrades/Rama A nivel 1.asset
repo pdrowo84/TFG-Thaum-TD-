@@ -15,13 +15,14 @@ MonoBehaviour:
   UpgradeName: Armor Pen. +
   Description: 
   Icon: {fileID: 0}
-  Cost: 100
+  Cost: 125
   DamageMultiplier: 1
   FireRateMultiplier: 1
   RangeBonus: 0
-  ArmorPenetrationBonus: 0.165
+  ArmorPenetrationBonus: 0.15
   BounceCountBonus: 0
   SlowAmountBonus: 0
   SlowDurationBonus: 0
   ExplosionRadiusBonus: 0
+  BurnDurationBonus: 0
   ResultingState: 1

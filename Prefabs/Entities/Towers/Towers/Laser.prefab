@@ -412,12 +412,16 @@ MonoBehaviour:
   Target: {fileID: 0}
   TowerPivot: {fileID: 7903021394978673118}
   HasHeroBuff: 0
-  Damage: 0.01
-  FireRate: 25
+  Damage: 20
+  FireRate: 2
   Range: 5
-  SummonCost: 400
-  ArmorPenetration: 0
+  SummonCost: 200
+  ArmorPenetration: 0.15
   LaserBounceCount: 0
+  MissileExplosionRadius: 1
+  MissileSlowAmount: 0
+  MissileSlowDuration: 0
+  FlameBurnDuration: 0
   TotalInvestedCost: 0
   SellRefundPercentage: 70
   TargetingMode: 0

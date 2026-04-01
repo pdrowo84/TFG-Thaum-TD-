@@ -25,8 +25,16 @@ public class Enemy : MonoBehaviour
     // Guardamos la velocidad base para recomponerla cuando los efectos expiren
     public float BaseSpeed;
 
+    // Guardar la velocidad original del prefab al despertar (solo se ejecuta una vez por instancia)
+    private void Awake()
+    {
+        // En Awake tomamos la velocidad configurada en el prefab como BaseSpeed
+        BaseSpeed = Speed;
+    }
+
     public void Init()
     {
+        // Limpiar efectos previos y restaurar estado base
         ActiveEffects = new List<Effect>();
 
         IsDead = false;
@@ -34,8 +42,8 @@ public class Enemy : MonoBehaviour
         transform.position = GameLoopManager.NodePositions[0];
         NodeIndex = 0;
 
-        BaseSpeed = Speed;
-
+        // Restaurar velocidad a la base original (evita arrastrar ralentizaciones entre ciclos)
+        Speed = BaseSpeed;
     }
 
     [System.Serializable]

@@ -46,16 +46,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd0bc69a6516d8346a2500ca9150b96e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  EnemyElementType: 0
   NodeIndex: 0
   RootPart: {fileID: 8545185801791478033}
   DamageResistance: 1
-  MaxHealth: 5
+  MaxHealth: 112
   Health: 0
-  Speed: 4
+  Speed: 2.5
   ID: 0
   LifeDamage: 1
-  MoneyReward: 50
+  MoneyReward: 5
   IsDead: 0
+  BaseSpeed: 0
   Immunities: 
   Resistances: []
 --- !u!1 &6136744077782817907

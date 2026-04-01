@@ -15,10 +15,10 @@ MonoBehaviour:
   UpgradeName: Damage +
   Description: 
   Icon: {fileID: 0}
-  Cost: 100
-  DamageMultiplier: 1.2
+  Cost: 125
+  DamageMultiplier: 1.25
   FireRateMultiplier: 1
-  RangeBonus: 2
+  RangeBonus: 0
   ArmorPenetrationBonus: 0
   BounceCountBonus: 0
   SlowAmountBonus: 0

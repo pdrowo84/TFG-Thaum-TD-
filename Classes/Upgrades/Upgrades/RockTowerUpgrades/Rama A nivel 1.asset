@@ -21,7 +21,8 @@ MonoBehaviour:
   RangeBonus: 0
   ArmorPenetrationBonus: 0
   BounceCountBonus: 0
-  SlowAmountBonus: 0.25
-  SlowDurationBonus: 2
+  SlowAmountBonus: 0.15
+  SlowDurationBonus: 1
   ExplosionRadiusBonus: 0
+  BurnDurationBonus: 0
   ResultingState: 1

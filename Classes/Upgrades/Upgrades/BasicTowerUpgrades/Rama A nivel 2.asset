@@ -15,8 +15,14 @@ MonoBehaviour:
   UpgradeName: Alcance ++
   Description: 
   Icon: {fileID: 0}
-  Cost: 200
+  Cost: 175
   DamageMultiplier: 1
   FireRateMultiplier: 1
-  RangeBonus: 4
+  RangeBonus: 1.4
+  ArmorPenetrationBonus: 0
+  BounceCountBonus: 0
+  SlowAmountBonus: 0.1
+  SlowDurationBonus: 0
+  ExplosionRadiusBonus: 0
+  BurnDurationBonus: 0
   ResultingState: 2
