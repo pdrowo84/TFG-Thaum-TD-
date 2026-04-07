@@ -25,6 +25,10 @@ public class Enemy : MonoBehaviour
     // Guardamos la velocidad base para recomponerla cuando los efectos expiren
     public float BaseSpeed;
 
+    // Nueva: inmunidad a ralentizaciones
+    [HideInInspector]
+    public bool IsSlowImmune = false;
+
     // Guardar la velocidad original del prefab al despertar (solo se ejecuta una vez por instancia)
     private void Awake()
     {
@@ -34,7 +38,6 @@ public class Enemy : MonoBehaviour
 
     public void Init()
     {
-        // Limpiar efectos previos y restaurar estado base
         ActiveEffects = new List<Effect>();
 
         IsDead = false;
@@ -42,8 +45,13 @@ public class Enemy : MonoBehaviour
         transform.position = GameLoopManager.NodePositions[0];
         NodeIndex = 0;
 
-        // Restaurar velocidad a la base original (evita arrastrar ralentizaciones entre ciclos)
+        BaseSpeed = BaseSpeed <= 0f ? Speed : BaseSpeed;
+
+        // Restaurar velocidad/estado base cuando se (re)inicializa desde pool
         Speed = BaseSpeed;
+
+        // Asegurar que no arrastre inmunidades por defecto
+        IsSlowImmune = false;
     }
 
     [System.Serializable]

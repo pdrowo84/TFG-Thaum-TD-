@@ -146,9 +146,10 @@ MonoBehaviour:
   Speed: 3.8
   ID: 0
   LifeDamage: 4
-  MoneyReward: 100
+  MoneyReward: 67
   IsDead: 0
   BaseSpeed: 0
+  IsSlowImmune: 0
   Immunities: 
   Resistances:
   - Element: 3

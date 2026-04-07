@@ -323,9 +323,10 @@ MonoBehaviour:
   Speed: 1.2
   ID: 0
   LifeDamage: 5
-  MoneyReward: 150
+  MoneyReward: 67
   IsDead: 0
   BaseSpeed: 0
+  IsSlowImmune: 0
   Immunities: 
   Resistances:
   - Element: 4
@@ -347,7 +348,6 @@ MonoBehaviour:
   healthIncreasePerNode: 0.02
   scaleIncreasePerNode: 0.1
   RootPartOverrideObject: {fileID: 6136744077782817907}
-  spawnOffset: {x: 0, y: 2, z: 0}
 --- !u!1 &3861231253155385227
 GameObject:
   m_ObjectHideFlags: 0

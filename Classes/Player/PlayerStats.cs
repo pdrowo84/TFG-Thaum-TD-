@@ -25,8 +25,8 @@ public class PlayerStats : MonoBehaviour
     {
         CurrentMoney = StartingMoney;
         CurrentLife = StartingLife;
-        MoneyDisplayText.SetText($"$ {StartingMoney}");
-        LifeDisplayText.SetText($"<3 {StartingLife}");
+        MoneyDisplayText.SetText($"  {StartingMoney}");
+        LifeDisplayText.SetText($"   {StartingLife}");
 
         // Mostrar el coste de cada torre
         for (int i = 0; i < TowerPrefabs.Length && i < TowerCostTexts.Length; i++)

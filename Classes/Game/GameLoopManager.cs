@@ -179,6 +179,16 @@ public class GameLoopManager : MonoBehaviour
                         continue;
                     }
 
+                    // Si el efecto afecta la velocidad y el enemigo es inmune a ralentizaciones, ignorar.
+                    if (CurrentDamageData.EffectToApply != null && CurrentDamageData.EffectToApply.SpeedMultiplier != 1f)
+                    {
+                        if (CurrentDamageData.EnemyToAffect.IsSlowImmune)
+                        {
+                            Debug.Log($"GameLoopManager: {CurrentDamageData.EnemyToAffect.name} es inmune a ralentizaciones. Ignorando efecto '{CurrentDamageData.EffectToApply.EffectName}'.");
+                            continue;
+                        }
+                    }
+
                     Effect EffectDuplicate = CurrentDamageData.EnemyToAffect.ActiveEffects.Find(x => x.EffectName == CurrentDamageData.EffectToApply.EffectName);
 
                     if (EffectDuplicate == null)

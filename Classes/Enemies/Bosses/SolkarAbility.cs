@@ -5,6 +5,7 @@ using UnityEngine;
 /// - Al llegar a un nuevo NodeIndex incrementa su vida y escala progresivamente.
 /// - Permite override del RootPart para anclar pivote de spawn/escalado.
 /// - Escala anclando al RootPartOverrideObject para que el "cuerpo" crezca desde ese punto.
+/// - Solkar será inmune a ralentizaciones mientras esté activo.
 /// </summary>
 [RequireComponent(typeof(Enemy))]
 public class SolkarAbility : MonoBehaviour
@@ -43,8 +44,21 @@ public class SolkarAbility : MonoBehaviour
             enemy.RootPart = RootPartOverrideObject.transform;
         }
 
+        // Marcar inmunidad a ralentizaciones
+        enemy.IsSlowImmune = true;
+
         // Reiniciar seguimiento de nodo a la posición actual del enemy
         lastNodeIndex = enemy.NodeIndex;
+    }
+
+    void OnDisable()
+    {
+        // Al desactivarse quitar inmunidad para evitar que se arrastre al volver a spawnear
+        if (enemy == null) enemy = GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            enemy.IsSlowImmune = false;
+        }
     }
 
     void Update()
@@ -70,7 +84,7 @@ public class SolkarAbility : MonoBehaviour
 
         // Aumentar MaxHealth y Health proporcionalmente
         enemy.MaxHealth *= healthFactor;
-        enemy.Health *= healthFactor; // mantiene ratio actual de vida
+        enemy.Health *= healthFactor; // mantiene razón de vida actual
 
         // Escalado: si hay RootPartOverrideObject lo usamos como pivote para mantenerlo fijo en mundo.
         if (RootPartOverrideObject != null)
