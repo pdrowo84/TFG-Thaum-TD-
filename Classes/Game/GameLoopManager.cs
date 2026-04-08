@@ -14,6 +14,7 @@ public class GameLoopManager : MonoBehaviour
     public List<WaveData> Waves;
     private int currentWave = 0;
     private bool waveInProgress = false;
+    private bool victoryShown = false;
 
     public static List<TowerBehaviour> TowersInGame;
     public static Vector3[] NodePositions;
@@ -30,13 +31,19 @@ public class GameLoopManager : MonoBehaviour
     public bool LoopShouldEnd;
 
     public UnityEngine.UI.Toggle speedToggle;
+    private static float DesiredTimeScale = 1f;
+    private static bool IsPaused = false;
 
     [Header("UI")]
-    [Tooltip("Texto que mostrar· la oleada actual (ej. 3/20)")]
+    [Tooltip("Texto que mostrarù la oleada actual (ej. 3/20)")]
     public TextMeshProUGUI WaveText;
+    [Tooltip("Panel de victoria (se activa al completar todas las oleadas)")]
+    public GameObject VictoryPanel;
+    [Tooltip("Panel principal de la UI de juego (se ocultarù en victoria)")]
+    public GameObject GameplayUIPanel;
 
     [Header("Enemies")]
-    [Tooltip("Velocidad angular en grados/seg que usan los enemigos para rotar hacia su direcciÛn de movimiento")]
+    [Tooltip("Velocidad angular en grados/seg que usan los enemigos para rotar hacia su direcciùn de movimiento")]
     public float EnemyRotationSpeed = 720f;
 
     private void Start()
@@ -47,6 +54,7 @@ public class GameLoopManager : MonoBehaviour
 
         currentWave = 0;
         waveInProgress = false;
+        victoryShown = false;
 
         PlayerStatistics = FindObjectOfType<PlayerStats>();
         EffectsQueue = new Queue<ApplyEffectData>();
@@ -58,6 +66,8 @@ public class GameLoopManager : MonoBehaviour
         NodePositions = new Vector3[NodeParent.childCount];
 
         if (speedToggle != null) speedToggle.onValueChanged.AddListener(ChangeSpeed);
+        // Respetar el estado del toggle al iniciar la escena
+        ChangeSpeed(speedToggle != null && speedToggle.isOn);
 
         for (int i = 0; i < NodePositions.Length; i++)
         {
@@ -79,6 +89,9 @@ public class GameLoopManager : MonoBehaviour
     }
     private void Update()
     {
+        // Si ya se mostrù la victoria, no arrancar mùs oleadas
+        if (victoryShown) return;
+
         // Si no hay oleada en curso y no quedan enemigos vivos, lanza la siguiente oleada
         if (!waveInProgress && EntitySummoner.EnemiesInGame != null && EntitySummoner.EnemiesInGame.Count == 0)
         {
@@ -90,9 +103,9 @@ public class GameLoopManager : MonoBehaviour
     {
 
         if (EntitySummoner.EnemiesInGame == null)
-            Debug.LogError("EnemiesInGame no est· inicializado");
+            Debug.LogError("EnemiesInGame no estù inicializado");
         if (EntitySummoner.EnemiesIsGameTransform == null)
-            Debug.LogError("EnemiesIsGameTransform no est· inicializado");
+            Debug.LogError("EnemiesIsGameTransform no estù inicializado");
 
         while (LoopShouldEnd == false)
         {
@@ -194,13 +207,13 @@ public class GameLoopManager : MonoBehaviour
                     if (EffectDuplicate == null)
                     {
                         CurrentDamageData.EnemyToAffect.ActiveEffects.Add(CurrentDamageData.EffectToApply);
-                        Debug.Log($"[Efecto] AÒadido efecto '{CurrentDamageData.EffectToApply.EffectName}' a {CurrentDamageData.EnemyToAffect.name}");
+                        Debug.Log($"[Efecto] Aùadido efecto '{CurrentDamageData.EffectToApply.EffectName}' a {CurrentDamageData.EnemyToAffect.name}");
                     }
 
                     else
                     {
                         EffectDuplicate.ExpireTime = CurrentDamageData.EffectToApply.ExpireTime;
-                        Debug.Log($"[Efecto] Refrescada duraciÛn de '{EffectDuplicate.EffectName}' en {CurrentDamageData.EnemyToAffect.name}");
+                        Debug.Log($"[Efecto] Refrescada duraciùn de '{EffectDuplicate.EffectName}' en {CurrentDamageData.EnemyToAffect.name}");
                     }
 
                 }
@@ -223,7 +236,7 @@ public class GameLoopManager : MonoBehaviour
                     // Ignorar entradas para enemigos nulos o ya muertos (por pooling)
                     if (CurrentDamageData.TargetedEnemy == null || CurrentDamageData.TargetedEnemy.IsDead)
                     {
-                        Debug.Log("GameLoopManager: Saltando daÒo en cola para enemigo nulo/muerto.");
+                        Debug.Log("GameLoopManager: Saltando daùo en cola para enemigo nulo/muerto.");
                         continue;
                     }
 
@@ -231,7 +244,7 @@ public class GameLoopManager : MonoBehaviour
                     if (CurrentDamageData.DamageElement != ElementType.None)
                         multiplier = CurrentDamageData.TargetedEnemy.GetElementalMultiplier(CurrentDamageData.DamageElement);
 
-                    // Aplica el daÒo con el multiplicador elemental y la penetraciÛn
+                    // Aplica el daùo con el multiplicador elemental y la penetraciùn
                     float effectiveResistance = Mathf.Max(0.1f, CurrentDamageData.Resistance * (1f - CurrentDamageData.Penetration));
                     CurrentDamageData.TargetedEnemy.Health -= (CurrentDamageData.TotalDamage * multiplier) / effectiveResistance;
 
@@ -270,11 +283,41 @@ public class GameLoopManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("°Todas las oleadas completadas!");
+            Debug.Log("ùTodas las oleadas completadas!");
+            ShowVictory();
         }
 
-        // Actualizar UI despuÈs de intentar arrancar la siguiente ola
+        // Actualizar UI despuùs de intentar arrancar la siguiente ola
         UpdateWaveText();
+    }
+
+    private void ShowVictory()
+    {
+        if (victoryShown) return;
+        victoryShown = true;
+
+        // Pausar el juego y mostrar panel de victoria
+        Time.timeScale = 0f;
+
+        if (VictoryPanel != null)
+            VictoryPanel.SetActive(true);
+
+        if (GameplayUIPanel != null)
+            GameplayUIPanel.SetActive(false);
+    }
+
+    // Botùn UI: jugar de nuevo (reinicia escena/estado)
+    public void VictoryPlayAgain()
+    {
+        // ResetGame normaliza timeScale y recarga escena
+        ResetGame();
+    }
+
+    // Botùn UI: salir del juego
+    public void VictoryQuit()
+    {
+        Debug.Log("Saliendo del juego (victoria)");
+        Application.Quit();
     }
 
     private IEnumerator SpawnWave(WaveData wave)
@@ -305,7 +348,7 @@ public class GameLoopManager : MonoBehaviour
                 break;
 
             case WaveData.SpawnMode.Interleaved:
-                // Round-robin: spawnea 1 de cada entrada por iteraciÛn hasta agotar todas
+                // Round-robin: spawnea 1 de cada entrada por iteraciùn hasta agotar todas
                 int entries = wave.EnemiesToSpawn.Length;
                 int[] remaining = new int[entries];
                 for (int e = 0; e < entries; e++) remaining[e] = Mathf.Max(0, wave.EnemiesToSpawn[e].Count);
@@ -391,11 +434,13 @@ public class GameLoopManager : MonoBehaviour
 
     public static void PauseGame()
     {
+        IsPaused = true;
         Time.timeScale = 0f;
     }
     public static void ResumeGame()
     {
-        Time.timeScale = 1f;
+        IsPaused = false;
+        Time.timeScale = DesiredTimeScale;
     }
 
     public static void ResetGame()
@@ -407,31 +452,33 @@ public class GameLoopManager : MonoBehaviour
             manager.StopAllCoroutines();
         }
 
-        // Limpiar colas est·ticas para evitar aplicar daÒo/efectos pendientes tras el reload
+        // Limpiar colas estùticas para evitar aplicar daùo/efectos pendientes tras el reload
         if (EffectsQueue != null) EffectsQueue.Clear();
         if (DamageData != null) DamageData.Clear();
         if (EnemyIDsToSummon != null) EnemyIDsToSummon.Clear();
         if (EnemiesToRemove != null) EnemiesToRemove.Clear();
 
-        // Limpiar y destruir objetos pool antiguos para evitar estados persistentes (e.g. enemigos daÒados)
+        // Limpiar y destruir objetos pool antiguos para evitar estados persistentes (e.g. enemigos daùados)
         EntitySummoner.ForceReinit(destroyPooledObjects: true);
 
-        // Limpia listas p˙blicas/est·ticas referenciadas por el GameLoop
+        // Limpia listas pùblicas/estùticas referenciadas por el GameLoop
         if (EntitySummoner.EnemiesInGame != null) EntitySummoner.EnemiesInGame.Clear();
         if (EntitySummoner.EnemiesIsGameTransform != null) EntitySummoner.EnemiesIsGameTransform.Clear();
         if (TowersInGame != null) TowersInGame.Clear();
 
-        // Destruye todas las torres activas en la escena actual por si quedan instancias huÈrfanas
+        // Destruye todas las torres activas en la escena actual por si quedan instancias huùrfanas
         foreach (var tower in Object.FindObjectsOfType<TowerBehaviour>())
         {
             if (tower != null)
                 Object.Destroy(tower.gameObject);
         }
 
-        // Resetear el estado del hÈroe
+        // Resetear el estado del hùroe
         TowerPlacing.ResetHeroPlacement();
 
         // Asegura escala de tiempo normalizada
+        IsPaused = false;
+        DesiredTimeScale = 1f;
         Time.timeScale = 1f;
 
         // Recarga la escena (estado ya limpiado)
@@ -441,7 +488,12 @@ public class GameLoopManager : MonoBehaviour
 
     public void ChangeSpeed(bool isFast)
     {
-        Time.timeScale = isFast ? 2f : 1f;
+        DesiredTimeScale = isFast ? 2f : 1f;
+
+        // Si el juego est· pausado (o en un panel que pausa), no tocar el timescale actual.
+        // Al reanudar, ResumeGame aplicar· DesiredTimeScale.
+        if (!IsPaused)
+            Time.timeScale = DesiredTimeScale;
     }
 
     public void GoToMainMenu()
@@ -459,7 +511,7 @@ public class GameLoopManager : MonoBehaviour
         int total = Waves.Count;
 
         // Cuando no ha empezado ninguna ola currentWave == 0 y waveInProgress == false -> mostrar 0/total
-        // Cuando est· en progreso o despuÈs de iniciar una ola, currentWave contiene el n˙mero de la ola en curso (1-based)
+        // Cuando estù en progreso o despuùs de iniciar una ola, currentWave contiene el nùmero de la ola en curso (1-based)
         int displayWave = Mathf.Clamp(currentWave, 0, total);
 
         // Si no hay oleadas configuradas, mostrar 0/0 por seguridad
@@ -472,7 +524,7 @@ public class GameLoopManager : MonoBehaviour
 
 public class Effect
 {
-    // AÒadido SpeedMultiplier para soporte de ralentizaciones (1 = sin cambio, 0.8 = 20% m·s lento)
+    // Aùadido SpeedMultiplier para soporte de ralentizaciones (1 = sin cambio, 0.8 = 20% mùs lento)
     public Effect(string effectName, float damageRate, float damage, float expireTime, ElementType damageElement, float speedMultiplier = 1f)
     {
 
@@ -538,7 +590,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
 
     public float DeltaTime;
 
-    // Nueva: velocidad angular (grados/seg) para rotaciÛn suave hacia la direcciÛn de movimiento
+    // Nueva: velocidad angular (grados/seg) para rotaciùn suave hacia la direcciùn de movimiento
     public float RotationSpeed;
 
     public void Execute(int index, TransformAccess transform)
@@ -549,7 +601,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
         Vector3 PositionToMove = NodePositions[NodeIndex[index]];
         Vector3 currentPos = transform.position;
 
-        // DirecciÛn hacia el objetivo
+        // Direcciùn hacia el objetivo
         Vector3 dir = PositionToMove - currentPos;
         float distToTarget = dir.magnitude;
 
@@ -557,7 +609,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
         Vector3 newPos = Vector3.MoveTowards(currentPos, PositionToMove, EnemySpeeds[index] * DeltaTime);
         transform.position = newPos;
 
-        // Rotar suavemente hacia la direcciÛn de movimiento si hay separaciÛn
+        // Rotar suavemente hacia la direcciùn de movimiento si hay separaciùn
         Vector3 moveDir = newPos - currentPos;
         if (moveDir.sqrMagnitude > 0.000001f)
         {
@@ -566,7 +618,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, RotationSpeed * DeltaTime);
         }
 
-        // Si hemos alcanzado la posiciÛn objetivo, avanzamos al siguiente nodo
+        // Si hemos alcanzado la posiciùn objetivo, avanzamos al siguiente nodo
         if (newPos == PositionToMove)
         {
             NodeIndex[index]++;

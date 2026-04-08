@@ -649,7 +649,7 @@ GameObject:
   m_Component:
   - component: {fileID: 167561639245211164}
   - component: {fileID: 3133815103228012456}
-  - component: {fileID: 8894639727408686386}
+  - component: {fileID: 5048138012677767928}
   - component: {fileID: 5446849666926718990}
   m_Layer: 3
   m_Name: Basic
@@ -710,7 +710,7 @@ MonoBehaviour:
   ElementPriorityFilter: 0
   UpgradePath: {fileID: 11400000, guid: 97eb453f7d671c04a93a791c4c9bb435, type: 2}
   CurrentUpgradeState: 0
---- !u!114 &8894639727408686386
+--- !u!114 &5048138012677767928
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -719,11 +719,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 8928376256761899720}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00e9bb7b7ea439746bf1e9291f6f4888, type: 3}
+  m_Script: {fileID: 11500000, guid: 6667a90f96c64e54580f61468555cf6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   FirePoint: {fileID: 8324391133227524044}
-  BulletPrefab: {fileID: 4898952615211033650, guid: 3346474fc113ff9469ab5956158cc179, type: 3}
+  BulletPrefabs:
+  - {fileID: 4898952615211033650, guid: b69543c5db872ba419a73fc614d8494e, type: 3}
+  - {fileID: 4898952615211033650, guid: bc8bc939921bfef4f907c7c9c04d6eaf, type: 3}
+  - {fileID: 4898952615211033650, guid: 03874df39ce4c5b4ab79993f1fa8708a, type: 3}
+  - {fileID: 4898952615211033650, guid: e538f1fbb29845941874b5f8d13772a1, type: 3}
 --- !u!65 &5446849666926718990
 BoxCollider:
   m_ObjectHideFlags: 0
