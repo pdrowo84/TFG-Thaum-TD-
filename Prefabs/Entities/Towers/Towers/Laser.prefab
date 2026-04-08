@@ -368,6 +368,7 @@ GameObject:
   - component: {fileID: 4227932762783405522}
   - component: {fileID: 3862514423934661910}
   - component: {fileID: 6886660480967772552}
+  - component: {fileID: -6742487694797202782}
   - component: {fileID: 3247717759348455469}
   m_Layer: 3
   m_Name: Laser
@@ -444,6 +445,24 @@ MonoBehaviour:
   LaserRenderer: {fileID: 2498560192274063813}
   BounceDamageMultiplier: 0.6
   MaxBounceDistance: 20
+--- !u!114 &-6742487694797202782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6436487045586015270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72d6369e9f4ed364b975ab2b1e848ffa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  whenToApply: 0
+  hueShiftDegrees: {x: -12, y: 12}
+  saturationMultiplier: {x: 0.85, y: 1.15}
+  valueMultiplier: {x: 0.9, y: 1.1}
+  targetRenderers: []
+  includeInactiveChildren: 1
 --- !u!65 &3247717759348455469
 BoxCollider:
   m_ObjectHideFlags: 0

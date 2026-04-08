@@ -978,6 +978,7 @@ GameObject:
   - component: {fileID: 683812974476639183}
   - component: {fileID: 8590965139152524386}
   - component: {fileID: 3742953341573791239}
+  - component: {fileID: 1827802019179036367}
   - component: {fileID: 1607294608411862315}
   m_Layer: 3
   m_Name: Missile
@@ -1057,6 +1058,24 @@ MonoBehaviour:
   MissileSystem: {fileID: 5529788998372214932}
   TowerHead: {fileID: 2076077186868044166}
   Damage: 3
+--- !u!114 &1827802019179036367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8092793531161794173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72d6369e9f4ed364b975ab2b1e848ffa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  whenToApply: 0
+  hueShiftDegrees: {x: -12, y: 12}
+  saturationMultiplier: {x: 0.85, y: 1.15}
+  valueMultiplier: {x: 0.9, y: 1.1}
+  targetRenderers: []
+  includeInactiveChildren: 1
 --- !u!65 &1607294608411862315
 BoxCollider:
   m_ObjectHideFlags: 0

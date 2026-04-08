@@ -650,6 +650,7 @@ GameObject:
   - component: {fileID: 167561639245211164}
   - component: {fileID: 3133815103228012456}
   - component: {fileID: 5048138012677767928}
+  - component: {fileID: -7126100026685092999}
   - component: {fileID: 5446849666926718990}
   m_Layer: 3
   m_Name: Basic
@@ -728,6 +729,24 @@ MonoBehaviour:
   - {fileID: 4898952615211033650, guid: bc8bc939921bfef4f907c7c9c04d6eaf, type: 3}
   - {fileID: 4898952615211033650, guid: 03874df39ce4c5b4ab79993f1fa8708a, type: 3}
   - {fileID: 4898952615211033650, guid: e538f1fbb29845941874b5f8d13772a1, type: 3}
+--- !u!114 &-7126100026685092999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8928376256761899720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72d6369e9f4ed364b975ab2b1e848ffa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  whenToApply: 0
+  hueShiftDegrees: {x: -12, y: 12}
+  saturationMultiplier: {x: 0.85, y: 1.15}
+  valueMultiplier: {x: 0.9, y: 1.1}
+  targetRenderers: []
+  includeInactiveChildren: 1
 --- !u!65 &5446849666926718990
 BoxCollider:
   m_ObjectHideFlags: 0

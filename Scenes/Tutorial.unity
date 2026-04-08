@@ -7135,7 +7135,7 @@ MonoBehaviour:
   - {fileID: 1320042462}
   - {fileID: 823048278}
   - {fileID: 1449834140}
-  StartingMoney: 400
+  StartingMoney: 3000
   StartingLife: 20
 --- !u!1 &823048275
 GameObject:
