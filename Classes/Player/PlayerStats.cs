@@ -40,7 +40,7 @@ public class PlayerStats : MonoBehaviour
     public void AddMoney(int MoneyToAdd)
     {
         CurrentMoney += MoneyToAdd;
-        MoneyDisplayText.SetText($"$ {CurrentMoney}");
+        MoneyDisplayText.SetText($"  {CurrentMoney}");
     }
 
     public int GetMoney()
@@ -52,7 +52,7 @@ public class PlayerStats : MonoBehaviour
     {
         CurrentLife -= amount;
         if (CurrentLife < 0) CurrentLife = 0;
-        LifeDisplayText.SetText($"<3 {CurrentLife}");
+        LifeDisplayText.SetText($"   {CurrentLife}");
         if (CurrentLife == 0)
         {
             Debug.Log("¡Has perdido!");

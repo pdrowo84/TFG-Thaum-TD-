@@ -59,27 +59,51 @@ public class TowerSelection : MonoBehaviour
         }
 
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
 
-        // Raycast hacia todas las capas primero
-        if (Physics.Raycast(ray, out hit, 1000f))
+        // Usamos RaycastAll y seleccionamos el primer collider válido (por distancia).
+        RaycastHit[] hits = Physics.RaycastAll(ray, 1000f);
+        if (hits == null || hits.Length == 0)
         {
-            // Buscar el componente TowerBehaviour en el objeto golpeado o en sus padres
-            TowerBehaviour tower = hit.collider.GetComponentInParent<TowerBehaviour>();
+            DeselectTower();
+            return;
+        }
 
+        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+        bool found = false;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            var hit = hits[i];
+
+            // Intentar resolver la torre desde el collider alcanzado
+            TowerBehaviour tower = hit.collider.GetComponentInParent<TowerBehaviour>();
             if (tower != null)
             {
-                // Verificar que está en la capa correcta
+                // Verificar que está en la capa permitida
                 if (((1 << tower.gameObject.layer) & TowerLayer) != 0)
                 {
                     SelectTower(tower);
-                    return;
+                    found = true;
+                    break;
                 }
             }
+            // Si no es torre, seguimos buscando en los siguientes hits (esto evita bloqueos por objetos intermedios)
         }
 
-        // Click en vacío, desseleccionar
-        DeselectTower();
+        if (!found)
+        {
+#if UNITY_EDITOR
+            // Depuración: lista de los primeros 6 objetos que recibe el rayo
+            string info = "TowerSelection: Hits (no torre válida encontrada): ";
+            int count = Mathf.Min(hits.Length, 6);
+            for (int j = 0; j < count; j++)
+            {
+                info += $"[{j}] {hits[j].collider.gameObject.name}(layer={hits[j].collider.gameObject.layer}) ";
+            }
+            Debug.Log(info);
+#endif
+            DeselectTower();
+        }
     }
 
     private void SelectTower(TowerBehaviour tower)

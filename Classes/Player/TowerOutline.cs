@@ -21,6 +21,25 @@ public class TowerOutline : MonoBehaviour
         outlineObjects = new GameObject[meshRenderers.Length];
         outlineMaterials = new Material[meshRenderers.Length];
 
+        // Determinar índice de la capa Ignore Raycast (fallback a 2 si no existe)
+        int ignoreLayer = LayerMask.NameToLayer("Ignore Raycast");
+        if (ignoreLayer < 0) ignoreLayer = 2;
+
+        // Intentar resolver un shader seguro para el outline (con fallbacks)
+        Shader outlineShader = Shader.Find("Unlit/Color")
+                              ?? Shader.Find("Universal Render Pipeline/Unlit")
+                              ?? Shader.Find("Sprites/Default")
+                              ?? Shader.Find("Standard");
+
+        if (outlineShader == null)
+        {
+            Debug.LogWarning("TowerOutline: No se encontró shader para outline. Se omite la creación del outline en esta instancia (evita crash en build).");
+            // Liberar arrays por seguridad
+            outlineObjects = null;
+            outlineMaterials = null;
+            return;
+        }
+
         for (int i = 0; i < meshRenderers.Length; i++)
         {
             MeshRenderer originalRenderer = meshRenderers[i];
@@ -36,14 +55,29 @@ public class TowerOutline : MonoBehaviour
             outlineObj.transform.localRotation = Quaternion.identity;
             outlineObj.transform.localScale = Vector3.one * (1f + width);
 
+            // Asegurarnos de que el outline NO bloquee raycasts
+            outlineObj.layer = ignoreLayer;
+            SetLayerRecursively(outlineObj, ignoreLayer);
+
             // Copiar la malla
             MeshFilter outlineFilter = outlineObj.AddComponent<MeshFilter>();
             outlineFilter.sharedMesh = originalFilter.sharedMesh;
 
-            // Crear material de outline sólido
+            // Crear material de outline seguro
+            Material outlineMat = null;
+            try
+            {
+                outlineMat = new Material(outlineShader) { color = color };
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"TowerOutline: fallo al crear material de outline: {ex.Message}. Se omite este outline.");
+                Destroy(outlineObj);
+                continue;
+            }
+
+            // Asignar renderer y material
             MeshRenderer outlineRenderer = outlineObj.AddComponent<MeshRenderer>();
-            Material outlineMat = new Material(Shader.Find("Unlit/Color"));
-            outlineMat.color = color;
             outlineRenderer.material = outlineMat;
             outlineMaterials[i] = outlineMat;
 
@@ -58,7 +92,7 @@ public class TowerOutline : MonoBehaviour
             outlineMesh.normals = originalFilter.sharedMesh.normals;
             outlineMesh.uv = originalFilter.sharedMesh.uv;
 
-            // Invertir triangulos para que se vea desde fuera
+            // Invertir triángulos para que se vea desde fuera
             int[] triangles = outlineMesh.triangles;
             for (int j = 0; j < triangles.Length; j += 3)
             {
@@ -101,12 +135,26 @@ public class TowerOutline : MonoBehaviour
         if (!isOutlineActive || outlineObjects == null)
             return;
 
-        // Destruir objetos de outline
-        foreach (GameObject outlineObj in outlineObjects)
+        // Destruir objetos de outline y materiales creados
+        for (int idx = 0; idx < outlineObjects.Length; idx++)
         {
+            GameObject outlineObj = outlineObjects[idx];
             if (outlineObj != null)
             {
                 Destroy(outlineObj);
+            }
+            // destruir material creado
+            if (outlineMaterials != null && outlineMaterials.Length > idx)
+            {
+                var mat = outlineMaterials[idx];
+                if (mat != null)
+                {
+#if UNITY_EDITOR
+                    DestroyImmediate(mat);
+#else
+                    Destroy(mat);
+#endif
+                }
             }
         }
 
@@ -118,5 +166,16 @@ public class TowerOutline : MonoBehaviour
     void OnDestroy()
     {
         DisableOutline();
+    }
+
+    // Fija la capa recursivamente para un objeto y sus hijos
+    private void SetLayerRecursively(GameObject go, int layer)
+    {
+        if (go == null) return;
+        go.layer = layer;
+        foreach (Transform child in go.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
     }
 }
