@@ -173,7 +173,7 @@ MonoBehaviour:
   minSpawnInterval: 0.15
   trailRadius: 0.75
   trailDuration: 2.5
-  speedMultiplier: 1.2
+  speedMultiplier: 1.4
   trailRotationOffsetEuler: {x: 0, y: 180, z: 0}
   spawnBackwardOffset: 0.5
 --- !u!1 &3582322100905791021

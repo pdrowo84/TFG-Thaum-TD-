@@ -107,7 +107,9 @@ public class EntitySummoner : MonoBehaviour
                 // fallback: instantiate if pooled entry estaba null
                 GameObject NewEnemy = Instantiate(EnemyPrefabs[EnemyID], GameLoopManager.NodePositions[0], Quaternion.identity);
                 SummonedEnemy = NewEnemy.GetComponent<Enemy>();
+                SummonedEnemy.gameObject.SetActive(false);
                 SummonedEnemy.Init();
+                SummonedEnemy.gameObject.SetActive(true);
             }
         }
         else
@@ -115,7 +117,9 @@ public class EntitySummoner : MonoBehaviour
             // Instantiate new instance of enemy and initialize
             GameObject NewEnemy = Instantiate(EnemyPrefabs[EnemyID], GameLoopManager.NodePositions[0], Quaternion.identity);
             SummonedEnemy = NewEnemy.GetComponent<Enemy>();
+            SummonedEnemy.gameObject.SetActive(false);
             SummonedEnemy.Init();
+            SummonedEnemy.gameObject.SetActive(true);
         }
 
         if (SummonedEnemy != null)

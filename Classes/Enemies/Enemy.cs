@@ -50,8 +50,9 @@ public class Enemy : MonoBehaviour
         // Restaurar velocidad/estado base cuando se (re)inicializa desde pool
         Speed = BaseSpeed;
 
-        // Asegurar que no arrastre inmunidades por defecto
-        IsSlowImmune = false;
+        // No resetear IsSlowImmune aquÌ: en la primera instancia Init() corre despuÈs de OnEnable
+        // y borrarÌa la inmunidad de bosses (p. ej. SolkarAbility). Queda en false por defecto;
+        // SolkarAbility lo pone en OnEnable tras activar; OnDisable al enpoolar lo limpia.
     }
 
     [System.Serializable]
@@ -66,7 +67,7 @@ public class Enemy : MonoBehaviour
 
     public void Tick()
     {
-        if (this == null) return; // ProtecciÛn extra
+        if (this == null) return; // Protecciùn extra
 
         for (int i = 0; i < ActiveEffects.Count; i++)
         {
@@ -98,9 +99,11 @@ public class Enemy : MonoBehaviour
         {
             foreach (var eff in ActiveEffects)
             {
-                // sÛlo efectos con SpeedMultiplier != 1 influyen
-                if (eff.SpeedMultiplier != 1f)
-                    speedMul *= eff.SpeedMultiplier;
+                if (eff.SpeedMultiplier == 1f)
+                    continue;
+                if (IsSlowImmune && eff.SpeedMultiplier < 1f)
+                    continue;
+                speedMul *= eff.SpeedMultiplier;
             }
         }
 
@@ -115,7 +118,7 @@ public class Enemy : MonoBehaviour
         {
             var resistance = Resistances.Find(r => r.Element == attackElement);
             if (resistance != null)
-                return 1f - resistance.Resistance; // Ej: 0.5 resistencia = 0.5 daÒo recibido
+                return 1f - resistance.Resistance; // Ej: 0.5 resistencia = 0.5 daùo recibido
         }
 
         return 1f; // Sin resistencia ni inmunidad

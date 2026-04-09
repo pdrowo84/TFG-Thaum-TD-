@@ -69,11 +69,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   duration: 2
-  speedMultiplier: 1.2
+  speedMultiplier: 1.5
   effectName: LunethSpeed
   enemyLayer:
     serializedVersion: 2
     m_Bits: 256
+  Owner: {fileID: 0}
 --- !u!198 &6699716772402363806
 ParticleSystem:
   m_ObjectHideFlags: 0
