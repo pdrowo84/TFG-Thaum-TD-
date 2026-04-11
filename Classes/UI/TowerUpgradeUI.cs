@@ -204,6 +204,10 @@ public class TowerUpgradeUI : MonoBehaviour
         btn.transform.localScale = Vector3.one;
         btn.gameObject.SetActive(true);
 
+        // Gamefeel: hover wobble + click SFX (si existe AudioSource en el prefab o en el botón)
+        if (btn.GetComponent<GameFeel.UIButtonFeedback>() == null)
+            btn.gameObject.AddComponent<GameFeel.UIButtonFeedback>();
+
         TextMeshProUGUI label = btn.GetComponentInChildren<TextMeshProUGUI>();
         if (label == null)
         {

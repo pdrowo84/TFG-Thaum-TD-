@@ -5,65 +5,61 @@ public class HeroeTornado : MonoBehaviour
 {
     [Header("Passive Buff")]
     public float BuffRadius = 5f;
-    public float DamageBuff = 2f; // multiplicador de daño (2 = x2)
+    public float DamageBuff = 1.3f; // multiplicador de daño
     public ElementDamageType.ElementType RequiredElement = ElementDamageType.ElementType.Wind;
 
     [Header("Active Ability")]
-    public float AbilityCooldown = 30f; // Tiempo de enfriamiento en segundos
-    public GameObject TornadoPrefab; // Prefab del tornado (cubo blanco por ahora)
-    public GameObject TornadoSpawnPoint; // GameObject en el centro del mapa (asignar manualmente o se busca automáticamente)
-    public float TornadoDuration = 5f; // Duración de la habilidad activa
-    public float TornadoDamageMultiplier = 3f; // Multiplicador del daño del héroe
+    public float AbilityCooldown = 30f;
+    public GameObject TornadoPrefab;
+    public GameObject TornadoSpawnPoint;
+    public float TornadoDuration = 5f;
+    public float TornadoDamageMultiplier = 3f;
+
+    [Header("GameFeel (Cut-in)")]
+    [SerializeField] private GameFeel.HeroAbilityCutIn abilityCutIn;
 
     [Header("Visualization")]
-    public bool ShowPassiveRadius = true; // Mostrar radio de buff pasivo
-    public Color PassiveRadiusColor = new Color(0, 1, 1, 0.5f); // Cyan transparente
-    public float PassiveLineWidth = 0.2f; // Grosor de la línea
+    public bool ShowPassiveRadius = true;
+    public Color PassiveRadiusColor = new Color(0, 1, 1, 0.5f);
+    public float PassiveLineWidth = 0.2f;
 
     private float cooldownTimer = 0f;
     private bool isAbilityReady = true;
 
-    // Referencia para encontrar el botón por código
     private Button abilityButton;
-
-    // Referencia al tornado activo para visualización
     private GameObject activeTornado;
-
-    // LineRenderer para el radio pasivo
     private LineRenderer passiveRadiusRenderer;
 
     void Start()
     {
-        // Si no está asignado manualmente, buscar por nombre
+        if (abilityCutIn == null)
+        {
+#if UNITY_2020_1_OR_NEWER
+            abilityCutIn = FindObjectOfType<GameFeel.HeroAbilityCutIn>(true);
+#else
+            abilityCutIn = FindObjectOfType<GameFeel.HeroAbilityCutIn>();
+#endif
+        }
+
         if (TornadoSpawnPoint == null)
         {
             TornadoSpawnPoint = GameObject.Find("TornadoSpawnPoint");
-            if (TornadoSpawnPoint != null)
-            {
-                Debug.Log("HeroeTornado: TornadoSpawnPoint encontrado.");
-            }
-            else
-            {
-                Debug.LogError("HeroeTornado: No se encontró 'TornadoSpawnPoint' en la escena.");
-            }
+            if (TornadoSpawnPoint != null) Debug.Log("HeroeTornado: TornadoSpawnPoint encontrado.");
+            else Debug.LogError("HeroeTornado: No se encontró 'TornadoSpawnPoint' en la escena.");
         }
 
-        // Buscar el botón por nombre
         GameObject buttonObj = GameObject.Find("TornadoAbilityButton");
         if (buttonObj != null)
         {
             abilityButton = buttonObj.GetComponent<Button>();
             if (abilityButton != null)
             {
-                abilityButton.onClick.RemoveAllListeners();
                 abilityButton.onClick.AddListener(ActivateAbility);
                 Debug.Log("HeroeTornado: Botón encontrado y listener añadido.");
             }
         }
 
-        // Crear visualización del radio pasivo
         CreatePassiveRadiusVisualization();
-
         UpdateButtonState();
     }
 
@@ -72,9 +68,9 @@ public class HeroeTornado : MonoBehaviour
         ApplyPassiveBuff();
         UpdateAbilityCooldown();
         UpdatePassiveRadiusVisualization();
+        UpdateButtonState();
     }
 
-    // Crea el LineRenderer para el radio del buff pasivo
     private void CreatePassiveRadiusVisualization()
     {
         if (!ShowPassiveRadius) return;
@@ -104,7 +100,6 @@ public class HeroeTornado : MonoBehaviour
         }
     }
 
-    // Actualiza el efecto visual del radio pasivo (pulso)
     private void UpdatePassiveRadiusVisualization()
     {
         if (passiveRadiusRenderer != null)
@@ -116,7 +111,6 @@ public class HeroeTornado : MonoBehaviour
         }
     }
 
-    // Aplica el buff pasivo a torres cercanas con elemento viento
     private void ApplyPassiveBuff()
     {
         TowerBehaviour myTower = GetComponent<TowerBehaviour>();
@@ -148,7 +142,6 @@ public class HeroeTornado : MonoBehaviour
         }
     }
 
-    // Actualiza el temporizador de enfriamiento
     private void UpdateAbilityCooldown()
     {
         if (!isAbilityReady)
@@ -163,15 +156,14 @@ public class HeroeTornado : MonoBehaviour
         }
     }
 
-    // Activa la habilidad especial
     public void ActivateAbility()
     {
         if (!isAbilityReady) return;
 
+        if (abilityCutIn != null) abilityCutIn.Play();
+
         if (TornadoSpawnPoint == null)
-        {
             TornadoSpawnPoint = GameObject.Find("TornadoSpawnPoint");
-        }
 
         if (TornadoSpawnPoint == null || TornadoPrefab == null)
         {
@@ -183,10 +175,7 @@ public class HeroeTornado : MonoBehaviour
         GameObject tornado = Instantiate(TornadoPrefab, spawnPos, Quaternion.identity);
         activeTornado = tornado;
 
-        if (tornado.transform.localScale == Vector3.zero)
-        {
-            tornado.transform.localScale = Vector3.one * 2f;
-        }
+        if (tornado.transform.localScale == Vector3.zero) tornado.transform.localScale = Vector3.one * 2f;
 
         TornadoAbility tornadoScript = tornado.GetComponent<TornadoAbility>();
         if (tornadoScript != null)
@@ -212,52 +201,51 @@ public class HeroeTornado : MonoBehaviour
         activeTornado = null;
     }
 
-    // Actualiza el estado visual del botón
     private void UpdateButtonState()
     {
         if (abilityButton != null)
         {
-            abilityButton.interactable = isAbilityReady;
+            bool placed = false;
+            var tb = GetComponent<TowerBehaviour>();
+            if (tb != null && GameLoopManager.TowersInGame != null)
+            {
+                placed = GameLoopManager.TowersInGame.Contains(tb);
+            }
+
+            abilityButton.interactable = placed && isAbilityReady;
 
             Text buttonText = abilityButton.GetComponentInChildren<Text>();
             if (buttonText != null)
             {
-                if (isAbilityReady)
-                {
-                    buttonText.text = "Tornado";
-                }
+                if (isAbilityReady && placed) buttonText.text = "Tornado";
                 else
                 {
-                    buttonText.text = $"{Mathf.CeilToInt(cooldownTimer)}s";
+                    if (!isAbilityReady) buttonText.text = $"{Mathf.CeilToInt(cooldownTimer)}s";
+                    else buttonText.text = "Tornado";
                 }
             }
         }
     }
 
-    // Visualización en el Editor (Gizmos)
-    void OnDrawGizmos()
-    {
-        if (ShowPassiveRadius)
-        {
-            Gizmos.color = new Color(PassiveRadiusColor.r, PassiveRadiusColor.g, PassiveRadiusColor.b, 0.3f);
-            Gizmos.DrawWireSphere(transform.position, BuffRadius);
-        }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        if (ShowPassiveRadius)
-        {
-            Gizmos.color = PassiveRadiusColor;
-            Gizmos.DrawWireSphere(transform.position, BuffRadius);
-        }
-    }
-
     void OnDestroy()
     {
-        if (passiveRadiusRenderer != null)
+        if (passiveRadiusRenderer != null) Destroy(passiveRadiusRenderer.gameObject);
+
+        if (abilityButton != null)
         {
-            Destroy(passiveRadiusRenderer.gameObject);
+            abilityButton.interactable = false;
+            abilityButton.onClick.RemoveListener(ActivateAbility);
         }
+    }
+
+    public bool IsPlaced()
+    {
+        var tb = GetComponent<TowerBehaviour>();
+        return tb != null && GameLoopManager.TowersInGame != null && GameLoopManager.TowersInGame.Contains(tb);
+    }
+
+    public bool IsAbilityAvailable()
+    {
+        return isAbilityReady;
     }
 }

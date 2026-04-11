@@ -15,7 +15,7 @@ MonoBehaviour:
   EnemiesToSpawn:
   - EnemyID: 1
     Count: 10
-  - EnemyID: 13
+  - EnemyID: 14
     Count: 1
   SpawnInterval: 1
   Mode: 1

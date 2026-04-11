@@ -35,15 +35,15 @@ public class GameLoopManager : MonoBehaviour
     private static bool IsPaused = false;
 
     [Header("UI")]
-    [Tooltip("Texto que mostrarù la oleada actual (ej. 3/20)")]
+    [Tooltip("Texto que mostrarÔøΩ la oleada actual (ej. 3/20)")]
     public TextMeshProUGUI WaveText;
     [Tooltip("Panel de victoria (se activa al completar todas las oleadas)")]
     public GameObject VictoryPanel;
-    [Tooltip("Panel principal de la UI de juego (se ocultarù en victoria)")]
+    [Tooltip("Panel principal de la UI de juego (se ocultarÔøΩ en victoria)")]
     public GameObject GameplayUIPanel;
 
     [Header("Enemies")]
-    [Tooltip("Velocidad angular en grados/seg que usan los enemigos para rotar hacia su direcciùn de movimiento")]
+    [Tooltip("Velocidad angular en grados/seg que usan los enemigos para rotar hacia su direcciÔøΩn de movimiento")]
     public float EnemyRotationSpeed = 720f;
 
     private void Start()
@@ -89,7 +89,7 @@ public class GameLoopManager : MonoBehaviour
     }
     private void Update()
     {
-        // Si ya se mostrù la victoria, no arrancar mùs oleadas
+        // Si ya se mostrÔøΩ la victoria, no arrancar mÔøΩs oleadas
         if (victoryShown) return;
 
         // Si no hay oleada en curso y no quedan enemigos vivos, lanza la siguiente oleada
@@ -103,9 +103,9 @@ public class GameLoopManager : MonoBehaviour
     {
 
         if (EntitySummoner.EnemiesInGame == null)
-            Debug.LogError("EnemiesInGame no estù inicializado");
+            Debug.LogError("EnemiesInGame no estÔøΩ inicializado");
         if (EntitySummoner.EnemiesIsGameTransform == null)
-            Debug.LogError("EnemiesIsGameTransform no estù inicializado");
+            Debug.LogError("EnemiesIsGameTransform no estÔøΩ inicializado");
 
         while (LoopShouldEnd == false)
         {
@@ -205,13 +205,13 @@ public class GameLoopManager : MonoBehaviour
                     if (EffectDuplicate == null)
                     {
                         CurrentDamageData.EnemyToAffect.ActiveEffects.Add(CurrentDamageData.EffectToApply);
-                        Debug.Log($"[Efecto] Aùadido efecto '{CurrentDamageData.EffectToApply.EffectName}' a {CurrentDamageData.EnemyToAffect.name}");
+                        Debug.Log($"[Efecto] AÔøΩadido efecto '{CurrentDamageData.EffectToApply.EffectName}' a {CurrentDamageData.EnemyToAffect.name}");
                     }
 
                     else
                     {
                         EffectDuplicate.ExpireTime = CurrentDamageData.EffectToApply.ExpireTime;
-                        Debug.Log($"[Efecto] Refrescada duraciùn de '{EffectDuplicate.EffectName}' en {CurrentDamageData.EnemyToAffect.name}");
+                        Debug.Log($"[Efecto] Refrescada duraciÔøΩn de '{EffectDuplicate.EffectName}' en {CurrentDamageData.EnemyToAffect.name}");
                     }
 
                 }
@@ -234,7 +234,7 @@ public class GameLoopManager : MonoBehaviour
                     // Ignorar entradas para enemigos nulos o ya muertos (por pooling)
                     if (CurrentDamageData.TargetedEnemy == null || CurrentDamageData.TargetedEnemy.IsDead)
                     {
-                        Debug.Log("GameLoopManager: Saltando daùo en cola para enemigo nulo/muerto.");
+                        Debug.Log("GameLoopManager: Saltando daÔøΩo en cola para enemigo nulo/muerto.");
                         continue;
                     }
 
@@ -242,7 +242,7 @@ public class GameLoopManager : MonoBehaviour
                     if (CurrentDamageData.DamageElement != ElementType.None)
                         multiplier = CurrentDamageData.TargetedEnemy.GetElementalMultiplier(CurrentDamageData.DamageElement);
 
-                    // Aplica el daùo con el multiplicador elemental y la penetraciùn
+                    // Aplica el daÔøΩo con el multiplicador elemental y la penetraciÔøΩn
                     float effectiveResistance = Mathf.Max(0.1f, CurrentDamageData.Resistance * (1f - CurrentDamageData.Penetration));
                     CurrentDamageData.TargetedEnemy.Health -= (CurrentDamageData.TotalDamage * multiplier) / effectiveResistance;
 
@@ -281,11 +281,11 @@ public class GameLoopManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("ùTodas las oleadas completadas!");
+            Debug.Log("ÔøΩTodas las oleadas completadas!");
             ShowVictory();
         }
 
-        // Actualizar UI despuùs de intentar arrancar la siguiente ola
+        // Actualizar UI despuÔøΩs de intentar arrancar la siguiente ola
         UpdateWaveText();
     }
 
@@ -304,14 +304,14 @@ public class GameLoopManager : MonoBehaviour
             GameplayUIPanel.SetActive(false);
     }
 
-    // Botùn UI: jugar de nuevo (reinicia escena/estado)
+    // BotÔøΩn UI: jugar de nuevo (reinicia escena/estado)
     public void VictoryPlayAgain()
     {
         // ResetGame normaliza timeScale y recarga escena
         ResetGame();
     }
 
-    // Botùn UI: salir del juego
+    // BotÔøΩn UI: salir del juego
     public void VictoryQuit()
     {
         Debug.Log("Saliendo del juego (victoria)");
@@ -346,7 +346,7 @@ public class GameLoopManager : MonoBehaviour
                 break;
 
             case WaveData.SpawnMode.Interleaved:
-                // Round-robin: spawnea 1 de cada entrada por iteraciùn hasta agotar todas
+                // Round-robin: spawnea 1 de cada entrada por iteraciÔøΩn hasta agotar todas
                 int entries = wave.EnemiesToSpawn.Length;
                 int[] remaining = new int[entries];
                 for (int e = 0; e < entries; e++) remaining[e] = Mathf.Max(0, wave.EnemiesToSpawn[e].Count);
@@ -443,43 +443,24 @@ public class GameLoopManager : MonoBehaviour
 
     public static void ResetGame()
     {
-        // Detener cualquier loop activo en instancias existentes
-        foreach (var manager in Object.FindObjectsOfType<GameLoopManager>())
-        {
-            manager.LoopShouldEnd = true;
-            manager.StopAllCoroutines();
-        }
-
-        // Limpiar colas estùticas para evitar aplicar daùo/efectos pendientes tras el reload
-        if (EffectsQueue != null) EffectsQueue.Clear();
-        if (DamageData != null) DamageData.Clear();
-        if (EnemyIDsToSummon != null) EnemyIDsToSummon.Clear();
-        if (EnemiesToRemove != null) EnemiesToRemove.Clear();
-
-        // Limpiar y destruir objetos pool antiguos para evitar estados persistentes (e.g. enemigos daùados)
-        EntitySummoner.ForceReinit(destroyPooledObjects: true);
-
-        // Limpia listas pùblicas/estùticas referenciadas por el GameLoop
+        // Limpia pools y listas para evitar referencias a objetos destruidos
         if (EntitySummoner.EnemiesInGame != null) EntitySummoner.EnemiesInGame.Clear();
         if (EntitySummoner.EnemiesIsGameTransform != null) EntitySummoner.EnemiesIsGameTransform.Clear();
-        if (TowersInGame != null) TowersInGame.Clear();
-
-        // Destruye todas las torres activas en la escena actual por si quedan instancias huùrfanas
-        foreach (var tower in Object.FindObjectsOfType<TowerBehaviour>())
+        if (EntitySummoner.EnemyObjectPools != null)
         {
-            if (tower != null)
-                Object.Destroy(tower.gameObject);
+            foreach (var pool in EntitySummoner.EnemyObjectPools.Values)
+                pool.Clear();
         }
 
-        // Resetear el estado del hùroe
-        TowerPlacing.ResetHeroPlacement();
+        // Destruir singletons persistentes que puedan romper referencias (ej. CutInManager)
+        if (GameFeel.CutInManager.Instance != null)
+        {
+            Object.Destroy(GameFeel.CutInManager.Instance.gameObject);
+        }
 
-        // Asegura escala de tiempo normalizada
-        IsPaused = false;
-        DesiredTimeScale = 1f;
+        // Si tienes otros managers singletons con DontDestroyOnLoad, destr√∫yelos aqu√≠ tambi√©n.
+
         Time.timeScale = 1f;
-
-        // Recarga la escena (estado ya limpiado)
         Scene current = SceneManager.GetActiveScene();
         SceneManager.LoadScene(current.name);
     }
@@ -488,8 +469,8 @@ public class GameLoopManager : MonoBehaviour
     {
         DesiredTimeScale = isFast ? 2f : 1f;
 
-        // Si el juego est· pausado (o en un panel que pausa), no tocar el timescale actual.
-        // Al reanudar, ResumeGame aplicar· DesiredTimeScale.
+        // Si el juego estÔøΩ pausado (o en un panel que pausa), no tocar el timescale actual.
+        // Al reanudar, ResumeGame aplicarÔøΩ DesiredTimeScale.
         if (!IsPaused)
             Time.timeScale = DesiredTimeScale;
     }
@@ -509,7 +490,7 @@ public class GameLoopManager : MonoBehaviour
         int total = Waves.Count;
 
         // Cuando no ha empezado ninguna ola currentWave == 0 y waveInProgress == false -> mostrar 0/total
-        // Cuando estù en progreso o despuùs de iniciar una ola, currentWave contiene el nùmero de la ola en curso (1-based)
+        // Cuando estÔøΩ en progreso o despuÔøΩs de iniciar una ola, currentWave contiene el nÔøΩmero de la ola en curso (1-based)
         int displayWave = Mathf.Clamp(currentWave, 0, total);
 
         // Si no hay oleadas configuradas, mostrar 0/0 por seguridad
@@ -522,7 +503,7 @@ public class GameLoopManager : MonoBehaviour
 
 public class Effect
 {
-    // Aùadido SpeedMultiplier para soporte de ralentizaciones (1 = sin cambio, 0.8 = 20% mùs lento)
+    // AÔøΩadido SpeedMultiplier para soporte de ralentizaciones (1 = sin cambio, 0.8 = 20% mÔøΩs lento)
     public Effect(string effectName, float damageRate, float damage, float expireTime, ElementType damageElement, float speedMultiplier = 1f)
     {
 
@@ -588,7 +569,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
 
     public float DeltaTime;
 
-    // Nueva: velocidad angular (grados/seg) para rotaciùn suave hacia la direcciùn de movimiento
+    // Nueva: velocidad angular (grados/seg) para rotaciÔøΩn suave hacia la direcciÔøΩn de movimiento
     public float RotationSpeed;
 
     public void Execute(int index, TransformAccess transform)
@@ -599,7 +580,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
         Vector3 PositionToMove = NodePositions[NodeIndex[index]];
         Vector3 currentPos = transform.position;
 
-        // Direcciùn hacia el objetivo
+        // DirecciÔøΩn hacia el objetivo
         Vector3 dir = PositionToMove - currentPos;
         float distToTarget = dir.magnitude;
 
@@ -607,7 +588,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
         Vector3 newPos = Vector3.MoveTowards(currentPos, PositionToMove, EnemySpeeds[index] * DeltaTime);
         transform.position = newPos;
 
-        // Rotar suavemente hacia la direcciùn de movimiento si hay separaciùn
+        // Rotar suavemente hacia la direcciÔøΩn de movimiento si hay separaciÔøΩn
         Vector3 moveDir = newPos - currentPos;
         if (moveDir.sqrMagnitude > 0.000001f)
         {
@@ -616,7 +597,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, RotationSpeed * DeltaTime);
         }
 
-        // Si hemos alcanzado la posiciùn objetivo, avanzamos al siguiente nodo
+        // Si hemos alcanzado la posiciÔøΩn objetivo, avanzamos al siguiente nodo
         if (newPos == PositionToMove)
         {
             NodeIndex[index]++;

@@ -9,6 +9,14 @@ public class TornadoAbility : MonoBehaviour
     public float AngularSpeed = 90f; // Velocidad angular (grados por segundo)
     public float DamageTickRate = 0.2f; // Cada cuánto aplica daño (en segundos)
 
+    [Header("Slow effect (aplica al contacto)")]
+    [Tooltip("Multiplicador de velocidad aplicado a enemigos (0.5 = 50% speed)")]
+    public float SlowMultiplier = 0.6f;
+    [Tooltip("Duración del slow en segundos")]
+    public float SlowDuration = 3f;
+    [Tooltip("Nombre del efecto de slow (para evitar duplicados por nombre)")]
+    public string SlowEffectName = "TornadoSlow";
+
     [Header("Visualization")]
     public bool ShowDetectionRadius = true; // Mostrar radio de detección
     public Color DetectionRadiusColor = new Color(0, 1, 0, 0.5f); // Verde transparente
@@ -50,13 +58,9 @@ public class TornadoAbility : MonoBehaviour
     // Mueve el tornado en espiral hacia afuera desde el centro
     private void MoveSpiralOutward()
     {
-        // Incrementar el ángulo (rotación)
         currentAngle += AngularSpeed * Time.deltaTime;
-
-        // Incrementar el radio (expansión hacia afuera)
         currentRadius += SpiralSpeed * Time.deltaTime;
 
-        // Calcular nueva posición en coordenadas polares
         float angleInRadians = currentAngle * Mathf.Deg2Rad;
         float x = centerPosition.x + currentRadius * Mathf.Cos(angleInRadians);
         float z = centerPosition.z + currentRadius * Mathf.Sin(angleInRadians);
@@ -64,14 +68,13 @@ public class TornadoAbility : MonoBehaviour
         transform.position = new Vector3(x, centerPosition.y, z);
     }
 
-    // Detecta enemigos en el radio y aplica daño continuo
+    // Detecta enemigos en el radio y aplica daño continuo + slow al contacto
     private void DetectAndDamageEnemies()
     {
         if (EntitySummoner.EnemiesInGame == null) return;
 
         damageTickTimer -= Time.deltaTime;
 
-        // Solo aplicar daño cuando el timer llegue a 0
         if (damageTickTimer <= 0f)
         {
             enemiesInContact.Clear();
@@ -89,10 +92,14 @@ public class TornadoAbility : MonoBehaviour
                     GameLoopManager.EnqueueDamageData(
                         new EnemyDamageData(enemy, damage, enemy.DamageResistance, ElementDamageType.ElementType.Wind)
                     );
+
+                    // Aplica/refresh del slow: efecto sin daño, solo SpeedMultiplier y duración.
+                    // El GameLoopManager evitará duplicados y refrescará la duración si ya existe.
+                    var slowEffect = new Effect(SlowEffectName, 0f, 0f, SlowDuration, ElementDamageType.ElementType.None, SlowMultiplier);
+                    GameLoopManager.EnqueueEffectToApply(new ApplyEffectData(enemy, slowEffect));
                 }
             }
 
-            // Reiniciar el timer
             damageTickTimer = DamageTickRate;
         }
     }
@@ -102,15 +109,11 @@ public class TornadoAbility : MonoBehaviour
     {
         if (!ShowDetectionRadius) return;
 
-        // Crear un nuevo GameObject hijo para el LineRenderer
         GameObject circleObject = new GameObject("TornadoRadiusVisual");
         circleObject.transform.SetParent(transform);
         circleObject.transform.localPosition = Vector3.zero;
 
-        // Añadir y configurar LineRenderer
         circleRenderer = circleObject.AddComponent<LineRenderer>();
-
-        // Configurar material (usa el material Default-Line o crea uno simple)
         circleRenderer.material = new Material(Shader.Find("Sprites/Default"));
         circleRenderer.startColor = DetectionRadiusColor;
         circleRenderer.endColor = DetectionRadiusColor;
@@ -119,7 +122,6 @@ public class TornadoAbility : MonoBehaviour
         circleRenderer.loop = true;
         circleRenderer.useWorldSpace = false;
 
-        // Generar puntos del círculo
         int segments = 16;
         circleRenderer.positionCount = segments;
 
@@ -128,7 +130,7 @@ public class TornadoAbility : MonoBehaviour
             float angle = (i / (float)segments) * Mathf.PI * 2f;
             float x = Mathf.Cos(angle) * DetectionRadius;
             float z = Mathf.Sin(angle) * DetectionRadius;
-            circleRenderer.SetPosition(i, new Vector3(x, 0.1f, z)); // 0.1f para elevarlo ligeramente del suelo
+            circleRenderer.SetPosition(i, new Vector3(x, 0.1f, z));
         }
     }
 
@@ -137,9 +139,7 @@ public class TornadoAbility : MonoBehaviour
     {
         if (circleRenderer != null)
         {
-            // El LineRenderer ya sigue al transform parent automáticamente
-            // Opcionalmente, puedes hacer que pulse o cambie de color
-            float pulse = 0.5f + Mathf.Sin(Time.time * 3f) * 0.2f; // Efecto de pulso
+            float pulse = 0.5f + Mathf.Sin(Time.time * 3f) * 0.2f;
             circleRenderer.startColor = new Color(DetectionRadiusColor.r, DetectionRadiusColor.g, DetectionRadiusColor.b, pulse);
             circleRenderer.endColor = new Color(DetectionRadiusColor.r, DetectionRadiusColor.g, DetectionRadiusColor.b, pulse);
         }
@@ -150,14 +150,11 @@ public class TornadoAbility : MonoBehaviour
     {
         if (!ShowDetectionRadius) return;
 
-        // Visualiza el área de detección del tornado
         Gizmos.color = new Color(DetectionRadiusColor.r, DetectionRadiusColor.g, DetectionRadiusColor.b, 0.5f);
         Gizmos.DrawWireSphere(transform.position, DetectionRadius);
 
-        // Círculo sólido en el suelo
         DrawCircle(transform.position, DetectionRadius, DetectionRadiusColor);
 
-        // Visualiza la trayectoria en espiral (útil para debug)
         if (Application.isPlaying)
         {
             Gizmos.color = Color.yellow;
@@ -165,7 +162,6 @@ public class TornadoAbility : MonoBehaviour
         }
     }
 
-    // Dibuja un círculo en el suelo (solo para Gizmos en Editor)
     private void DrawCircle(Vector3 center, float radius, Color color)
     {
         int segments = 32;
@@ -186,7 +182,6 @@ public class TornadoAbility : MonoBehaviour
 
     void OnDestroy()
     {
-        // Limpiar el LineRenderer si existe
         if (circleRenderer != null)
         {
             Destroy(circleRenderer.gameObject);

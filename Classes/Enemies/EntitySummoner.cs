@@ -13,8 +13,8 @@ public class EntitySummoner : MonoBehaviour
 
     private static bool IsInitialized;
 
-    // Asegura que los campos estáticos se reinicien al cargar la escena/play mode.
-    // Evita que valores estáticos persistentes (por ejemplo con Domain Reload desactivado)
+    // Asegura que los campos estï¿½ticos se reinicien al cargar la escena/play mode.
+    // Evita que valores estï¿½ticos persistentes (por ejemplo con Domain Reload desactivado)
     // impidan la recarga correcta de prefabs/colas.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStaticState()
@@ -29,12 +29,12 @@ public class EntitySummoner : MonoBehaviour
 
     public static void Init()
     {
-        // Si ya está marcado como inicializado y hay prefabs cargados, no hacer nada.
+        // Si ya estï¿½ marcado como inicializado y hay prefabs cargados, no hacer nada.
         if (IsInitialized && EnemyPrefabs != null && EnemyPrefabs.Count > 0)
             return;
 
-        // (Re)crea todas las estructuras - esto cubre tanto la primera inicialización
-        // como casos donde la inicialización anterior quedó en estado inconsistente.
+        // (Re)crea todas las estructuras - esto cubre tanto la primera inicializaciï¿½n
+        // como casos donde la inicializaciï¿½n anterior quedï¿½ en estado inconsistente.
         EnemyTransformPairs = new Dictionary<Transform, Enemy>();
         EnemyPrefabs = new Dictionary<int, GameObject>();
         EnemyObjectPools = new Dictionary<int, Queue<Enemy>>();
@@ -56,7 +56,7 @@ public class EntitySummoner : MonoBehaviour
         IsInitialized = true;
     }
 
-    // Forzar reinicialización (opcional) y opcionalmente destruir objetos en pool
+    // Forzar reinicializaciï¿½n (opcional) y opcionalmente destruir objetos en pool
     public static void ForceReinit(bool destroyPooledObjects = true)
     {
         if (EnemyObjectPools != null && destroyPooledObjects)
@@ -80,7 +80,7 @@ public class EntitySummoner : MonoBehaviour
     {
         if (EnemyPrefabs == null || !EnemyPrefabs.ContainsKey(EnemyID))
         {
-            Debug.LogError($"ENTITYSUMMONER: ENEMY WITH ID OF {EnemyID} DOES NOT EXIST OR PREFABS NO ESTÁN CARGADOS!");
+            Debug.LogError($"ENTITYSUMMONER: ENEMY WITH ID OF {EnemyID} DOES NOT EXIST OR PREFABS NO ESTï¿½N CARGADOS!");
             return null;
         }
 
@@ -146,7 +146,7 @@ public class EntitySummoner : MonoBehaviour
         }
         catch { /* ignore safety */ }
 
-        // Restaurar velocidad a la base original por si quedó alterada
+        // Restaurar velocidad a la base original por si quedï¿½ alterada
         try
         {
             EnemyToRemove.Speed = EnemyToRemove.BaseSpeed;

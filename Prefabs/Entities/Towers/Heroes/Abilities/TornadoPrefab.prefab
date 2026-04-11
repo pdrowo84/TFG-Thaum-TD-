@@ -124,9 +124,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DetectionRadius: 3.5
-  SpiralSpeed: 3
-  AngularSpeed: 90
+  SpiralSpeed: 2
+  AngularSpeed: 360
   DamageTickRate: 0.2
+  SlowMultiplier: 0.5
+  SlowDuration: 3
+  SlowEffectName: TornadoSlow
   ShowDetectionRadius: 1
   DetectionRadiusColor: {r: 0.7224546, g: 0.8018868, b: 0.791065, a: 0.5}
   LineWidth: 0.1

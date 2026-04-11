@@ -18,6 +18,9 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int StartingMoney; // Dinero inicial
     [SerializeField] private int StartingLife; // Vida inicial
 
+    [Header("GameFeel")]
+    [SerializeField] private GameFeel.DamageFeedback damageFeedback;
+
     private int CurrentMoney;
     private int CurrentLife;
     
@@ -53,6 +56,13 @@ public class PlayerStats : MonoBehaviour
         CurrentLife -= amount;
         if (CurrentLife < 0) CurrentLife = 0;
         LifeDisplayText.SetText($"   {CurrentLife}");
+
+        if (amount > 0)
+        {
+            if (damageFeedback != null)
+                damageFeedback.Play();
+        }
+
         if (CurrentLife == 0)
         {
             Debug.Log("¡Has perdido!");

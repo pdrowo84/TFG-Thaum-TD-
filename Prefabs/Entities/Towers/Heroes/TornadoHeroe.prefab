@@ -119,8 +119,8 @@ GameObject:
   - component: {fileID: 4163126293477806009}
   - component: {fileID: 4257525589118416666}
   - component: {fileID: 287180137784037823}
-  - component: {fileID: 8741314485319920161}
   - component: {fileID: -3077957878964217363}
+  - component: {fileID: 8741314485319920161}
   m_Layer: 3
   m_Name: TornadoHeroe
   m_TagString: NoPlace
@@ -164,8 +164,8 @@ MonoBehaviour:
   Target: {fileID: 0}
   TowerPivot: {fileID: 7712396101131872583}
   HasHeroBuff: 0
-  Damage: 0.5
-  FireRate: 3
+  Damage: 14
+  FireRate: 1.5
   Range: 5
   SummonCost: 400
   ArmorPenetration: 0
@@ -199,10 +199,25 @@ MonoBehaviour:
   TornadoPrefab: {fileID: 905197000048422588, guid: b4fe1417edd1c094d8b1dfb03f250630, type: 3}
   TornadoSpawnPoint: {fileID: 0}
   TornadoDuration: 5
-  TornadoDamageMultiplier: 3
+  TornadoDamageMultiplier: 2
+  abilityCutIn: {fileID: 0}
   ShowPassiveRadius: 1
   PassiveRadiusColor: {r: 0.7809719, g: 0.8490566, b: 0.8490566, a: 0.5}
   PassiveLineWidth: 0.2
+--- !u!114 &-3077957878964217363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943061094203421269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8c9e19b6519f524f883f248f356e927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FirePoint: {fileID: 6965727141784080570}
+  BulletPrefab: {fileID: 4898952615211033650, guid: 3346474fc113ff9469ab5956158cc179, type: 3}
 --- !u!65 &8741314485319920161
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -224,20 +239,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.8, y: 1.85, z: 1.8}
   m_Center: {x: 0, y: 0.97, z: -0.07}
---- !u!114 &-3077957878964217363
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 943061094203421269}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8c9e19b6519f524f883f248f356e927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  FirePoint: {fileID: 6965727141784080570}
-  BulletPrefab: {fileID: 4898952615211033650, guid: 3346474fc113ff9469ab5956158cc179, type: 3}
 --- !u!1 &1005299324565011945
 GameObject:
   m_ObjectHideFlags: 0
