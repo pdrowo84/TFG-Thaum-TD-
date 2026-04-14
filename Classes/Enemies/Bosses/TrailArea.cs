@@ -88,7 +88,7 @@ public class TrailArea : MonoBehaviour
 
         // Crear efecto: duration igual a la vida del área para simplicidad
         float expireTime = Mathf.Max(0.01f, duration);
-        Effect speedEffect = new Effect(effectName, 0f, 0f, expireTime, ElementType.None, speedMultiplier);
+        Effect speedEffect = new Effect(effectName, 0f, 0f, expireTime, ElementType.Ninguno, speedMultiplier);
 
         GameLoopManager.EnqueueEffectToApply(new ApplyEffectData(enemy, speedEffect));
 

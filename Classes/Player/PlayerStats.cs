@@ -18,8 +18,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int StartingMoney; // Dinero inicial
     [SerializeField] private int StartingLife; // Vida inicial
 
-    [Header("GameFeel")]
-    [SerializeField] private GameFeel.DamageFeedback damageFeedback;
+    [Header("Price Icon (opcional) - TextMeshPro Sprite Asset")]
+    [SerializeField] private TMP_SpriteAsset CoinSpriteAssetTMP;
+    [SerializeField] private string CoinSpriteName = "";
+    [SerializeField] private int CoinSpriteIndex = 0;
 
     private int CurrentMoney;
     private int CurrentLife;
@@ -36,7 +38,10 @@ public class PlayerStats : MonoBehaviour
         {
             var tower = TowerPrefabs[i].GetComponent<TowerBehaviour>();
             if (tower != null && TowerCostTexts[i] != null)
-                TowerCostTexts[i].SetText($"${tower.SummonCost}");
+            {
+                if (CoinSpriteAssetTMP != null) TowerCostTexts[i].spriteAsset = CoinSpriteAssetTMP;
+                TowerCostTexts[i].SetText($"{FormatPrice(tower.SummonCost)}");
+            }
         }
     }
 
@@ -57,12 +62,6 @@ public class PlayerStats : MonoBehaviour
         if (CurrentLife < 0) CurrentLife = 0;
         LifeDisplayText.SetText($"   {CurrentLife}");
 
-        if (amount > 0)
-        {
-            if (damageFeedback != null)
-                damageFeedback.Play();
-        }
-
         if (CurrentLife == 0)
         {
             Debug.Log("¡Has perdido!");
@@ -81,5 +80,19 @@ public class PlayerStats : MonoBehaviour
     public int GetLife()
     {
         return CurrentLife;
+    }
+
+    private string FormatPrice(int amount)
+    {
+        if (CoinSpriteAssetTMP != null)
+        {
+            string spriteTag = !string.IsNullOrEmpty(CoinSpriteName)
+                ? $"<sprite name=\"{CoinSpriteName}\">"
+                : $"<sprite index={CoinSpriteIndex}>";
+
+            return $"{amount} {spriteTag}";
+        }
+
+        return $"{amount}$";
     }
 }

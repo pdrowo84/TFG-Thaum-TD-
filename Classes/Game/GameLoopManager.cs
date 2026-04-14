@@ -114,7 +114,7 @@ public class GameLoopManager : MonoBehaviour
 
             if (EnemyIDsToSummon.Count > 0)
             {
-                for (int i = 0; i < EnemyIDsToSummon.Count; i++)
+                while (EnemyIDsToSummon.Count > 0)
                 {
                     EntitySummoner.SummonEnemy(EnemyIDsToSummon.Dequeue());
                 }
@@ -181,7 +181,7 @@ public class GameLoopManager : MonoBehaviour
             //Apply Effects
             if (EffectsQueue.Count > 0)
             {
-                for (int i = 0; i < EffectsQueue.Count; i++)
+                while (EffectsQueue.Count > 0)
                 {
                     ApplyEffectData CurrentDamageData = EffectsQueue.Dequeue();
 
@@ -227,7 +227,7 @@ public class GameLoopManager : MonoBehaviour
             //Damage Enemies
             if (DamageData.Count > 0)
             {
-                for (int i = 0; i < DamageData.Count; i++)
+                while (DamageData.Count > 0)
                 {
                     EnemyDamageData CurrentDamageData = DamageData.Dequeue();
 
@@ -239,7 +239,7 @@ public class GameLoopManager : MonoBehaviour
                     }
 
                     float multiplier = 1f;
-                    if (CurrentDamageData.DamageElement != ElementType.None)
+                    if (CurrentDamageData.DamageElement != ElementType.Ninguno)
                         multiplier = CurrentDamageData.TargetedEnemy.GetElementalMultiplier(CurrentDamageData.DamageElement);
 
                     // Aplica el da�o con el multiplicador elemental y la penetraci�n
@@ -249,7 +249,8 @@ public class GameLoopManager : MonoBehaviour
                     if (CurrentDamageData.TargetedEnemy.Health <= 0f && !CurrentDamageData.TargetedEnemy.IsDead)
                     {
                         CurrentDamageData.TargetedEnemy.IsDead = true;
-                        PlayerStatistics.AddMoney(CurrentDamageData.TargetedEnemy.MoneyReward);
+                        if (PlayerStatistics != null)
+                            PlayerStatistics.AddMoney(CurrentDamageData.TargetedEnemy.MoneyReward);
                         EnqueuedEnemyToRemove(CurrentDamageData.TargetedEnemy);
                     }
                 }
@@ -259,7 +260,7 @@ public class GameLoopManager : MonoBehaviour
 
             if (EnemiesToRemove.Count > 0)
             {
-                for (int i = 0; i < EnemiesToRemove.Count; i++)
+                while (EnemiesToRemove.Count > 0)
                 {
 
                     EntitySummoner.RemoveEnemy(EnemiesToRemove.Dequeue());
@@ -443,24 +444,39 @@ public class GameLoopManager : MonoBehaviour
 
     public static void ResetGame()
     {
-        // Limpia pools y listas para evitar referencias a objetos destruidos
+        // Detener loops activos antes de recargar
+        foreach (var manager in Object.FindObjectsOfType<GameLoopManager>())
+        {
+            manager.LoopShouldEnd = true;
+            manager.StopAllCoroutines();
+        }
+
+        // Limpiar colas estáticas pendientes
+        if (EffectsQueue != null) EffectsQueue.Clear();
+        if (DamageData != null) DamageData.Clear();
+        if (EnemyIDsToSummon != null) EnemyIDsToSummon.Clear();
+        if (EnemiesToRemove != null) EnemiesToRemove.Clear();
+
+        // Limpiar y destruir objetos de pool para no arrastrar referencias inválidas
+        EntitySummoner.ForceReinit(destroyPooledObjects: true);
+
         if (EntitySummoner.EnemiesInGame != null) EntitySummoner.EnemiesInGame.Clear();
         if (EntitySummoner.EnemiesIsGameTransform != null) EntitySummoner.EnemiesIsGameTransform.Clear();
-        if (EntitySummoner.EnemyObjectPools != null)
+        if (TowersInGame != null) TowersInGame.Clear();
+
+        foreach (var tower in Object.FindObjectsOfType<TowerBehaviour>())
         {
-            foreach (var pool in EntitySummoner.EnemyObjectPools.Values)
-                pool.Clear();
+            if (tower != null)
+                Object.Destroy(tower.gameObject);
         }
 
-        // Destruir singletons persistentes que puedan romper referencias (ej. CutInManager)
-        if (GameFeel.CutInManager.Instance != null)
-        {
-            Object.Destroy(GameFeel.CutInManager.Instance.gameObject);
-        }
+        // Resetear estado del héroe entre runs
+        TowerPlacing.ResetHeroPlacement();
 
-        // Si tienes otros managers singletons con DontDestroyOnLoad, destrúyelos aquí también.
-
+        IsPaused = false;
+        DesiredTimeScale = 1f;
         Time.timeScale = 1f;
+
         Scene current = SceneManager.GetActiveScene();
         SceneManager.LoadScene(current.name);
     }

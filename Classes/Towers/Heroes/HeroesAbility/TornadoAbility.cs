@@ -90,12 +90,12 @@ public class TornadoAbility : MonoBehaviour
 
                     // Aplica daño elemental de viento
                     GameLoopManager.EnqueueDamageData(
-                        new EnemyDamageData(enemy, damage, enemy.DamageResistance, ElementDamageType.ElementType.Wind)
+                        new EnemyDamageData(enemy, damage, enemy.DamageResistance, ElementDamageType.ElementType.Viento)
                     );
 
                     // Aplica/refresh del slow: efecto sin daño, solo SpeedMultiplier y duración.
                     // El GameLoopManager evitará duplicados y refrescará la duración si ya existe.
-                    var slowEffect = new Effect(SlowEffectName, 0f, 0f, SlowDuration, ElementDamageType.ElementType.None, SlowMultiplier);
+                    var slowEffect = new Effect(SlowEffectName, 0f, 0f, SlowDuration, ElementDamageType.ElementType.Ninguno, SlowMultiplier);
                     GameLoopManager.EnqueueEffectToApply(new ApplyEffectData(enemy, slowEffect));
                 }
             }

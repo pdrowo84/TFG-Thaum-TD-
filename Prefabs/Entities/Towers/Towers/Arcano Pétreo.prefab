@@ -981,7 +981,7 @@ GameObject:
   - component: {fileID: 1827802019179036367}
   - component: {fileID: 1607294608411862315}
   m_Layer: 3
-  m_Name: Missile
+  m_Name: "Arcano P\xE9treo"
   m_TagString: NoPlace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

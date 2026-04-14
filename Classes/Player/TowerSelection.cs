@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Maneja la selección de torres mediante clicks en el Game View
+/// Maneja la selecciï¿½n de torres mediante clicks en el Game View
 /// </summary>
 public class TowerSelection : MonoBehaviour
 {
@@ -9,11 +9,12 @@ public class TowerSelection : MonoBehaviour
     public LayerMask TowerLayer; // Layer de las torres (configura "Tower" layer)
     public Color OutlineColor = Color.black;
     [Range(0.01f, 0.3f)]
-    public float OutlineWidth = 0.05f; // Grosor del outline (5% más grande)
+    public float OutlineWidth = 0.05f; // Grosor del outline (5% mï¿½s grande)
 
     private Camera mainCamera;
     private TowerBehaviour selectedTower;
     private TowerOutline currentOutline;
+    private TowerPlacing towerPlacing;
 
     // Referencia al UI Manager
     private TowerUIManager uiManager;
@@ -22,15 +23,16 @@ public class TowerSelection : MonoBehaviour
     {
         mainCamera = Camera.main;
         uiManager = FindObjectOfType<TowerUIManager>();
+        towerPlacing = FindObjectOfType<TowerPlacing>();
 
         if (mainCamera == null)
         {
-            Debug.LogError("TowerSelection: No se encontró la cámara principal!");
+            Debug.LogError("TowerSelection: No se encontrï¿½ la cï¿½mara principal!");
         }
 
         if (uiManager == null)
         {
-            Debug.LogWarning("TowerSelection: No se encontró TowerUIManager en la escena.");
+            Debug.LogWarning("TowerSelection: No se encontrï¿½ TowerUIManager en la escena.");
         }
     }
 
@@ -51,6 +53,10 @@ public class TowerSelection : MonoBehaviour
 
     private void TrySelectTower()
     {
+        // Mientras se estï¿½ previsualizando/colocando una torre, no permitir selecciï¿½n de torres colocadas.
+        if (towerPlacing != null && towerPlacing.IsPlacingTower())
+            return;
+
         // Evitar seleccionar si estamos sobre UI
         if (UnityEngine.EventSystems.EventSystem.current != null &&
             UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
@@ -60,7 +66,7 @@ public class TowerSelection : MonoBehaviour
 
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-        // Usamos RaycastAll y seleccionamos el primer collider válido (por distancia).
+        // Usamos RaycastAll y seleccionamos el primer collider vï¿½lido (por distancia).
         RaycastHit[] hits = Physics.RaycastAll(ray, 1000f);
         if (hits == null || hits.Length == 0)
         {
@@ -79,9 +85,14 @@ public class TowerSelection : MonoBehaviour
             TowerBehaviour tower = hit.collider.GetComponentInParent<TowerBehaviour>();
             if (tower != null)
             {
-                // Verificar que está en la capa permitida
+                // Verificar que estï¿½ en la capa permitida
                 if (((1 << tower.gameObject.layer) & TowerLayer) != 0)
                 {
+                    // Evitar seleccionar torres en previsualizaciï¿½n/no colocadas aï¿½n.
+                    // Solo permitimos seleccionar torres registradas en el loop de juego.
+                    if (GameLoopManager.TowersInGame == null || !GameLoopManager.TowersInGame.Contains(tower))
+                        continue;
+
                     SelectTower(tower);
                     found = true;
                     break;
@@ -93,8 +104,8 @@ public class TowerSelection : MonoBehaviour
         if (!found)
         {
 #if UNITY_EDITOR
-            // Depuración: lista de los primeros 6 objetos que recibe el rayo
-            string info = "TowerSelection: Hits (no torre válida encontrada): ";
+            // Depuraciï¿½n: lista de los primeros 6 objetos que recibe el rayo
+            string info = "TowerSelection: Hits (no torre vï¿½lida encontrada): ";
             int count = Mathf.Min(hits.Length, 6);
             for (int j = 0; j < count; j++)
             {
@@ -120,7 +131,7 @@ public class TowerSelection : MonoBehaviour
 
         selectedTower = tower;
 
-        // Añadir outline visual (el color se actualizará desde TowerUIManager)
+        // Aï¿½adir outline visual (el color se actualizarï¿½ desde TowerUIManager)
         currentOutline = tower.gameObject.GetComponent<TowerOutline>();
         if (currentOutline == null)
         {
@@ -128,7 +139,7 @@ public class TowerSelection : MonoBehaviour
         }
         currentOutline.EnableOutline(OutlineColor, OutlineWidth);
 
-        // Notificar al UI Manager (esto actualizará el color del outline)
+        // Notificar al UI Manager (esto actualizarï¿½ el color del outline)
         if (uiManager != null)
         {
             uiManager.ShowTowerInfo(tower);

@@ -12,7 +12,7 @@ public class BillboardToCamera : MonoBehaviour
         MatchCameraForward
     }
 
-    [SerializeField] private Camera targetCamera;
+    [SerializeField] private UnityEngine.Camera targetCamera;
     [SerializeField] private BillboardMode mode = BillboardMode.FaceCameraPosition;
     [Tooltip("Si está activado, la rotación solo se ajusta en Y (evita inclinación arriba/abajo).")]
     [SerializeField] private bool lockYAxis = true;

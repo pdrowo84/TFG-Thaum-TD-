@@ -653,7 +653,7 @@ GameObject:
   - component: {fileID: -7126100026685092999}
   - component: {fileID: 5446849666926718990}
   m_Layer: 3
-  m_Name: Basic
+  m_Name: "Arcano Z\xE9firo"
   m_TagString: NoPlace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

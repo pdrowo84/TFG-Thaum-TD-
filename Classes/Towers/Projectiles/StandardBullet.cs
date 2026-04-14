@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using static ElementDamageType;
 
 public class StandardBullet : MonoBehaviour
@@ -7,7 +7,10 @@ public class StandardBullet : MonoBehaviour
     private float speed = 20f;
     private float damage;
     private ElementType damageType;
-    private float penetration; // nueva: penetración de armadura de la torre que disparó
+    private float penetration; // nueva: penetraciï¿½n de armadura de la torre que disparï¿½
+
+    [Tooltip("Si se asigna, solo este transform visual serÃ¡ orientado hacia el objetivo. Si es null, se usarÃ¡ el transform root.")]
+    [SerializeField] private Transform visual;
 
     public void Init(Enemy target, float damage, ElementType damageType, float penetration)
     {
@@ -36,12 +39,20 @@ public class StandardBullet : MonoBehaviour
         }
 
         transform.Translate(dir.normalized * distanceThisFrame, Space.World);
-        transform.LookAt(targetPos);
+
+        // Orienta solo el visual (si existe) o el root (comportamiento previo)
+        Transform rotTarget = visual != null ? visual : transform;
+        Vector3 lookSourcePos = rotTarget.position;
+        Vector3 toTarget = (targetPos - lookSourcePos);
+        if (toTarget.sqrMagnitude > 0.000001f)
+        {
+            rotTarget.rotation = Quaternion.LookRotation(toTarget.normalized);
+        }
     }
 
     void HitTarget()
     {
-        // Encola el daño para que lo procese GameLoopManager (respetando resistencias/inmunidades)
+        // Encola el daï¿½o para que lo procese GameLoopManager (respetando resistencias/inmunidades)
         GameLoopManager.EnqueueDamageData(new EnemyDamageData(target, damage, target.DamageResistance, damageType, penetration));
         Destroy(gameObject);
     }

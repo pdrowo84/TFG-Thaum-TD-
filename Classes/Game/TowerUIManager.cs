@@ -22,48 +22,97 @@ public class TowerUIManager : MonoBehaviour
     public TMP_Dropdown ElementFilterDropdown; // **NUEVO: Dropdown de filtro por elemento**
     public GameObject UpgradePanel;
     public Button SellButton;
-    public TextMeshProUGUI SellButtonText; // Texto del botón de venta (muestra el valor)
+    public TextMeshProUGUI SellButtonText; // Texto del botï¿½n de venta (muestra el valor)
 
-    [Header("Element Colors")]
+    [Header("Price Icon (opcional) - TextMeshPro Sprite Asset")]
+    [Tooltip("Sprite asset de TextMeshPro que contiene el icono de moneda (crear con 'Create -> TextMeshPro -> Sprite Asset').")]
+    public TMP_SpriteAsset CoinSpriteAssetTMP;
+    [Tooltip("Nombre del sprite dentro del TMP Sprite Asset (si se deja vacï¿½o se usarï¿½ el ï¿½ndice).")]
+    public string CoinSpriteName = "";
+    [Tooltip("ï¿½ndice del sprite dentro del TMP Sprite Asset (usado si CoinSpriteName estï¿½ vacï¿½o).")]
+    public int CoinSpriteIndex = 0;
+
+    [Header("Price Icon (legacy, optional Images)")]
+    [Tooltip("Sprite de la moneda (legacy).")]
+    public Sprite CoinSprite;
+    [Tooltip("Image que muestra el icono de la moneda junto al precio en el botï¿½n de venta (opcional).")]
+    public Image SellButtonPriceIcon;
+    [Tooltip("Image que muestra el icono de la moneda en el panel de confirmaciï¿½n (opcional).")]
+    public Image SellConfirmationPriceIcon;
+
+    [Header("Element Colors (legacy defaults)")]
     [Tooltip("Color para torres sin elemento")]
-    public Color NoneColor = new Color(0.7f, 0.7f, 0.7f, 0.8f);
+    public Color NoneColor = new Color(0.7f, 0.7f, 0.7f, 1f);
     [Tooltip("Color para torres de elemento Fuego")]
-    public Color FireColor = new Color(1f, 0.3f, 0f, 0.8f);
+    public Color FireColor = new Color(1f, 0.3f, 0f, 1f);
     [Tooltip("Color para torres de elemento Agua")]
-    public Color WaterColor = new Color(0f, 0.5f, 1f, 0.8f);
+    public Color WaterColor = new Color(0f, 0.5f, 1f, 1f);
     [Tooltip("Color para torres de elemento Viento")]
-    public Color WindColor = new Color(0.6f, 1f, 0.6f, 0.8f);
-    [Tooltip("Color para torres de elemento Tierra")]
-    public Color EarthColor = new Color(0.6f, 0.4f, 0.2f, 0.8f);
-    [Tooltip("Color para torres de elemento Rayo")]
-    public Color LightningColor = new Color(1f, 1f, 0f, 0.8f);
-    [Tooltip("Color para torres de elemento Hielo")]
-    public Color IceColor = new Color(0.5f, 0.8f, 1f, 0.8f);
+    public Color WindColor = new Color(0.6f, 1f, 0.6f, 1f);
+    [Tooltip("Color para torres de elemento Roca")]
+    public Color EarthColor = new Color(0.6f, 0.4f, 0.2f, 1f);
 
-    [Header("Outline Colors (más intensos que el panel)")]
+
+    [Header("Outline Colors (mï¿½s intensos que el panel) - legacy defaults")]
     public Color FireOutlineColor = new Color(1f, 0.2f, 0f, 1f);
     public Color WaterOutlineColor = new Color(0f, 0.4f, 1f, 1f);
     public Color WindOutlineColor = new Color(0.4f, 1f, 0.4f, 1f);
     public Color EarthOutlineColor = new Color(0.5f, 0.3f, 0.1f, 1f);
-    public Color LightningOutlineColor = new Color(1f, 1f, 0f, 1f);
-    public Color IceOutlineColor = new Color(0.3f, 0.7f, 1f, 1f);
     public Color NoneOutlineColor = Color.black;
 
+    [Header("Editable Element / Panel Color Sets")]
+    [Tooltip("Define aquï¿½ los colores de panel y outline por elemento. Si estï¿½ vacï¿½o se usan los valores legacy de arriba.")]
+    public List<ElementColorSet> ElementColorSets = new List<ElementColorSet>();
+
+    [Tooltip("Color por defecto del fondo del panel si no hay entrada para el elemento")]
+    public Color PanelDefaultColor = new Color(0.7f, 0.7f, 0.7f, 1f);
+
+    [Tooltip("Color por defecto del outline si no hay entrada para el elemento")]
+    public Color OutlineDefaultColor = Color.black;
+
+    [System.Serializable]
+    public class ElementColorSet
+    {
+        public ElementDamageType.ElementType Element = ElementDamageType.ElementType.Ninguno;
+        public Color PanelColor = Color.gray;
+        public Color OutlineColor = Color.black;
+    }
+
     [Header("Sell Settings")]
-    [Tooltip("Mostrar confirmación antes de vender")]
+    [Tooltip("Mostrar confirmaciï¿½n antes de vender")]
     public bool ShowSellConfirmation = true;
-    public GameObject SellConfirmationPanel; // Panel de confirmación (opcional)
-    public TextMeshProUGUI SellConfirmationText; // Texto de confirmación
+    public GameObject SellConfirmationPanel; // Panel de confirmaciï¿½n (opcional)
+    public TextMeshProUGUI SellConfirmationText; // Texto de confirmaciï¿½n
 
     private TowerBehaviour currentTower;
     private TowerSelection towerSelection;
     private PlayerStats playerStats;
 
+    private void OnValidate()
+    {
+        // Si el diseï¿½ador no ha rellenado ElementColorSets, inicializar con los valores legacy
+        if (ElementColorSets == null || ElementColorSets.Count == 0)
+        {
+            ElementColorSets = new List<ElementColorSet>
+            {
+                new ElementColorSet { Element = ElementDamageType.ElementType.Ninguno, PanelColor = NoneColor, OutlineColor = NoneOutlineColor },
+                new ElementColorSet { Element = ElementDamageType.ElementType.Fuego, PanelColor = FireColor, OutlineColor = FireOutlineColor },
+                new ElementColorSet { Element = ElementDamageType.ElementType.Agua, PanelColor = WaterColor, OutlineColor = WaterOutlineColor },
+                new ElementColorSet { Element = ElementDamageType.ElementType.Viento, PanelColor = WindColor, OutlineColor = WindOutlineColor },
+                new ElementColorSet { Element = ElementDamageType.ElementType.Roca, PanelColor = EarthColor, OutlineColor = EarthOutlineColor }
+            };
+
+            // Ajustar defaults coherentes con legacy
+            PanelDefaultColor = NoneColor;
+            OutlineDefaultColor = NoneOutlineColor;
+        }
+    }
+
     void Start()
     {
         // Buscar referencias
-        towerSelection = FindObjectOfType<TowerSelection>();
-        playerStats = FindObjectOfType<PlayerStats>();
+        tower_selection_init();
+        player_stats_init();
 
         // Ocultar panel al inicio
         if (TowerInfoPanel != null)
@@ -71,7 +120,7 @@ public class TowerUIManager : MonoBehaviour
             TowerInfoPanel.SetActive(false);
         }
 
-        // Ocultar panel de confirmación
+        // Ocultar panel de confirmaciï¿½n
         if (SellConfirmationPanel != null)
         {
             SellConfirmationPanel.SetActive(false);
@@ -89,7 +138,7 @@ public class TowerUIManager : MonoBehaviour
             PanelBackgroundImage = TowerInfoPanel.GetComponent<Image>();
         }
 
-        // Configurar botón de venta
+        // Configurar botï¿½n de venta
         if (SellButton != null)
         {
             SellButton.onClick.AddListener(OnSellButtonClicked);
@@ -100,7 +149,21 @@ public class TowerUIManager : MonoBehaviour
             TargetingDropdown.onValueChanged.AddListener(OnTargetingChanged);
             PopulateTargetingDropdown();
         }
+
+        // Legacy: ocultar Image icons si estï¿½n asignados (usaremos TMP sprite inline si se asigna)
+        if (SellButtonPriceIcon != null)
+        {
+            SellButtonPriceIcon.gameObject.SetActive(false);
+        }
+        if (SellConfirmationPriceIcon != null)
+        {
+            SellConfirmationPriceIcon.gameObject.SetActive(false);
+        }
     }
+
+    // pequeï¿½os helpers para Start() claridad
+    private void tower_selection_init() => towerSelection = FindObjectOfType<TowerSelection>();
+    private void player_stats_init() => playerStats = FindObjectOfType<PlayerStats>();
 
     /// <summary>
     /// Poblar el dropdown de filtro de elemento
@@ -135,16 +198,16 @@ public class TowerUIManager : MonoBehaviour
         List<string> options = new List<string>
     {
         "Primero",   // First
-        "Último",    // Last
+        "Ultimo",    // Last
         "Cercano",   // Close
         "Fuerte",    // Strong
-        "Débil"      // Weak
+        "Debil"      // Weak
     };
 
         TargetingDropdown.AddOptions(options);
     }
 
-    // (Se muestra únicamente la parte modificada: ShowTowerInfo + nueva coroutine)
+    // (Se muestra ï¿½nicamente la parte modificada: ShowTowerInfo + nueva coroutine)
     public void ShowTowerInfo(TowerBehaviour tower)
     {
         if (TowerInfoPanel == null) return;
@@ -152,7 +215,7 @@ public class TowerUIManager : MonoBehaviour
         currentTower = tower;
         TowerInfoPanel.SetActive(true);
 
-        // Obtener colores según el elemento
+        // Obtener colores segï¿½n el elemento
         Color panelColor = GetPanelColorForElement(tower.DamageElement);
         Color outlineColor = GetOutlineColorForElement(tower.DamageElement);
 
@@ -176,9 +239,10 @@ public class TowerUIManager : MonoBehaviour
 
         if (TowerStatsText != null)
         {
-            TowerStatsText.text = $"Daño: {tower.Damage:F1}\n" +
-                                   $"Cadencia: {tower.FireRate:F2}/s\n" +
-                                   $"Rango: {tower.Range:F1}";
+            TowerStatsText.text = $"Ataque: {tower.Damage:F1}\n" +
+                                  $"Cadencia: {tower.FireRate:F2}/s\n" +
+                                  $"Rango: {tower.Range:F1}\n" +
+                                  $"Pen. Armadura: {tower.ArmorPenetration:F1}\n";
         }
 
         if (TowerElementText != null)
@@ -186,7 +250,7 @@ public class TowerUIManager : MonoBehaviour
             TowerElementText.text = $"Elemento: {tower.DamageElement}";
         }
 
-        // Actualizar botón de venta
+        // Actualizar botï¿½n de venta
         UpdateSellButton(tower);
 
         // Actualizar dropdown de targeting**
@@ -199,7 +263,7 @@ public class TowerUIManager : MonoBehaviour
         if (UpgradeUI != null)
         {
             // Ejecutar ShowForTower en el siguiente frame para asegurar que
-            // el GameObject/Canvas del panel ya esté completamente activo y layout estabilizado.
+            // el GameObject/Canvas del panel ya estï¿½ completamente activo y layout estabilizado.
             StopCoroutine("ShowUpgradeUINextFrame");
             StartCoroutine(ShowUpgradeUINextFrame(tower));
         }
@@ -247,7 +311,7 @@ public class TowerUIManager : MonoBehaviour
     {
         if (TargetingDropdown == null) return;
 
-        // Convertir el enum a índice del dropdown
+        // Convertir el enum a ï¿½ndice del dropdown
         int dropdownIndex = (int)tower.TargetingMode;
         TargetingDropdown.SetValueWithoutNotify(dropdownIndex);
     }
@@ -258,19 +322,10 @@ public class TowerUIManager : MonoBehaviour
 
         int sellValue = tower.GetSellValue();
 
-        // Actualizar texto del botón
         if (SellButtonText != null)
         {
-            SellButtonText.text = $"Vender ({sellValue}$)";
-        }
-        else
-        {
-            // Si no hay texto específico, usar el del botón
-            TextMeshProUGUI buttonText = SellButton.GetComponentInChildren<TextMeshProUGUI>();
-            if (buttonText != null)
-            {
-                buttonText.text = $"Vender ({sellValue}$)";
-            }
+            SellButtonText.text = $"VENDER";
+            if (SellButtonPriceIcon != null) SellButtonPriceIcon.gameObject.SetActive(false);
         }
     }
 
@@ -292,24 +347,38 @@ public class TowerUIManager : MonoBehaviour
     {
         if (SellConfirmationPanel == null)
         {
-            // Si no hay panel de confirmación, vender directamente
+            // Si no hay panel de confirmaciï¿½n, vender directamente
             SellTower();
             return;
         }
 
         int sellValue = currentTower.GetSellValue();
 
-        // Mostrar panel de confirmación
+        // Mostrar panel de confirmaciï¿½n
         SellConfirmationPanel.SetActive(true);
 
         if (SellConfirmationText != null)
         {
-            SellConfirmationText.text = $"¿Vender {currentTower.name.Replace("(Clone)", "").Trim()} por {sellValue}$?";
+            if (CoinSpriteAssetTMP != null)
+            {
+                SellConfirmationText.spriteAsset = CoinSpriteAssetTMP;
+                string spriteTag = !string.IsNullOrEmpty(CoinSpriteName)
+                    ? $"<sprite name=\"{CoinSpriteName}\">"
+                    : $"<sprite index={CoinSpriteIndex}>";
+
+                SellConfirmationText.text = $"ï¿½Vender {currentTower.name.Replace("(Clone)", "").Trim()} por {sellValue} {spriteTag}?";
+                if (SellConfirmationPriceIcon != null) SellConfirmationPriceIcon.gameObject.SetActive(false);
+            }
+            else
+            {
+                SellConfirmationText.text = $"ï¿½Vender {currentTower.name.Replace("(Clone)", "").Trim()} por {sellValue}$?";
+                if (SellConfirmationPriceIcon != null) SellConfirmationPriceIcon.gameObject.SetActive(false);
+            }
         }
     }
 
     /// <summary>
-    /// Confirmar venta (llamado desde el botón "Sí" del panel de confirmación)
+    /// Confirmar venta (llamado desde el botï¿½n "Sï¿½" del panel de confirmaciï¿½n)
     /// </summary>
     public void ConfirmSell()
     {
@@ -322,7 +391,7 @@ public class TowerUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Cancelar venta (llamado desde el botón "No" del panel de confirmación)
+    /// Cancelar venta (llamado desde el botï¿½n "No" del panel de confirmaciï¿½n)
     /// </summary>
     public void CancelSell()
     {
@@ -368,6 +437,8 @@ public class TowerUIManager : MonoBehaviour
         Debug.Log("TowerUIManager: Torre destruida.");
     }
 
+    // pequeï¿½a ayuda para evitar warnings por referencia nula en el dif
+    private bool tower_selection_is_not_null() => towerSelection != null;
 
     public void HideTowerInfo()
     {
@@ -386,41 +457,57 @@ public class TowerUIManager : MonoBehaviour
 
     private Color GetPanelColorForElement(ElementDamageType.ElementType element)
     {
+        if (ElementColorSets != null && ElementColorSets.Count > 0)
+        {
+            var set = ElementColorSets.Find(x => x.Element == element);
+            if (set != null)
+                return set.PanelColor;
+        }
+
+        // Fallback a legacy switch si no hay set definido
         switch (element)
         {
-            case ElementDamageType.ElementType.Fire:
+            case ElementDamageType.ElementType.Fuego:
                 return FireColor;
-            case ElementDamageType.ElementType.Water:
+            case ElementDamageType.ElementType.Agua:
                 return WaterColor;
-            case ElementDamageType.ElementType.Wind:
+            case ElementDamageType.ElementType.Viento:
                 return WindColor;
-            case ElementDamageType.ElementType.Rock:
+            case ElementDamageType.ElementType.Roca:
                 return EarthColor;
-            case ElementDamageType.ElementType.None:
+            case ElementDamageType.ElementType.Ninguno:
             default:
-                return NoneColor;
+                return PanelDefaultColor != default ? PanelDefaultColor : NoneColor;
         }
     }
 
     private Color GetOutlineColorForElement(ElementDamageType.ElementType element)
     {
+        if (ElementColorSets != null && ElementColorSets.Count > 0)
+        {
+            var set = ElementColorSets.Find(x => x.Element == element);
+            if (set != null)
+                return set.OutlineColor;
+        }
+
+        // Fallback a legacy switch si no hay set definido
         switch (element)
         {
-            case ElementDamageType.ElementType.Fire:
+            case ElementDamageType.ElementType.Fuego:
                 return FireOutlineColor;
-            case ElementDamageType.ElementType.Water:
+            case ElementDamageType.ElementType.Agua:
                 return WaterOutlineColor;
-            case ElementDamageType.ElementType.Wind:
+            case ElementDamageType.ElementType.Viento:
                 return WindOutlineColor;
-            case ElementDamageType.ElementType.Rock:
+            case ElementDamageType.ElementType.Roca:
                 return EarthOutlineColor;
-            case ElementDamageType.ElementType.None:
+            case ElementDamageType.ElementType.Ninguno:
             default:
-                return NoneOutlineColor;
+                return OutlineDefaultColor != default ? OutlineDefaultColor : NoneOutlineColor;
         }
     }
 
-    // Métodos para Fase 3 y 4 (implementaremos después)
+    // Mï¿½todos para Fase 3 y 4 (implementaremos despuï¿½s)
     /// <summary>
     /// Callback cuando se cambia el dropdown de targeting
     /// </summary>
@@ -428,7 +515,7 @@ public class TowerUIManager : MonoBehaviour
     {
         if (currentTower == null) return;
 
-        // Convertir índice del dropdown a enum
+        // Convertir ï¿½ndice del dropdown a enum
         TowerTargeting.TargetType newMode = (TowerTargeting.TargetType)index;
         currentTower.SetTargetingMode(newMode);
 

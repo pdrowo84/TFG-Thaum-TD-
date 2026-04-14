@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 5690310693317073033}
   - component: {fileID: 7659097857847846675}
   - component: {fileID: 3628483110217971697}
-  - component: {fileID: 8505244496462752616}
+  - component: {fileID: 5853057234432791359}
   m_Layer: 0
-  m_Name: MusicNote 0
+  m_Name: semicorchea
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,7 +43,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4898952615211033650}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: -3048265513419834325, guid: 05e890638d83af64f81db56b5c4e9d39, type: 3}
 --- !u!23 &5690310693317073033
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -67,7 +67,8 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 06b7935c0a3b934408cc5fbc539409cc, type: 2}
+  - {fileID: -6478536213147159724, guid: 05e890638d83af64f81db56b5c4e9d39, type: 3}
+  - {fileID: -6629797300637803691, guid: 05e890638d83af64f81db56b5c4e9d39, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -122,7 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 858efe28297b74b4f8713bccdd25a60c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &8505244496462752616
+--- !u!114 &5853057234432791359
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

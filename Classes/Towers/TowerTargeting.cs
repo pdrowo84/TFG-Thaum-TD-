@@ -110,15 +110,15 @@ public class TowerTargeting : MonoBehaviour
         switch (filter)
         {
             case ElementFilter.Fire:
-                return ElementDamageType.ElementType.Fire;
+                return ElementDamageType.ElementType.Fuego;
             case ElementFilter.Water:
-                return ElementDamageType.ElementType.Water;
+                return ElementDamageType.ElementType.Agua;
             case ElementFilter.Wind:
-                return ElementDamageType.ElementType.Wind;
+                return ElementDamageType.ElementType.Viento;
             case ElementFilter.Rock:
-                return ElementDamageType.ElementType.Rock;
+                return ElementDamageType.ElementType.Roca;
             default:
-                return ElementDamageType.ElementType.None;
+                return ElementDamageType.ElementType.Ninguno;
         }
     }
 

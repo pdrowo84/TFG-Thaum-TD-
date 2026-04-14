@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: -3077957878964217363}
   - component: {fileID: 8741314485319920161}
   m_Layer: 3
-  m_Name: TornadoHeroe
+  m_Name: Augur Tornado
   m_TagString: NoPlace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

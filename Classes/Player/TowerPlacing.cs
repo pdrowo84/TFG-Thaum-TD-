@@ -12,7 +12,7 @@ public class TowerPlacing : MonoBehaviour
 
     private GameObject CurrentPlacingTower;
 
-    // Tracking de héroes colocados
+    // Tracking de hï¿½roes colocados
     public static bool HeroPlaced = false;
     private static Button heroPlacementButton;
 
@@ -21,7 +21,7 @@ public class TowerPlacing : MonoBehaviour
 
     void Start()
     {
-        // Resetear el estado del héroe al iniciar (por si viene de un reset)
+        // Resetear el estado del hï¿½roe al iniciar (por si viene de un reset)
         HeroPlaced = false;
         heroPlacementButton = null;
 
@@ -52,7 +52,7 @@ public class TowerPlacing : MonoBehaviour
             // Solo intenta colocar si el raycast ha detectado algo
             if (Input.GetMouseButtonDown(0) && hit && HitInfo.collider != null)
             {
-                // Evita colocar la torre si el ratón está sobre el UI
+                // Evita colocar la torre si el ratï¿½n estï¿½ sobre el UI
                 if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
                     return;
 
@@ -70,16 +70,16 @@ public class TowerPlacing : MonoBehaviour
 
                         PlayerStatisctics.AddMoney(-CurrentToweBehaviour.SummonCost);
 
-                        // Verificar si es un héroe y marcar como colocado
+                        // Verificar si es un hï¿½roe y marcar como colocado
                         HeroeTornado heroComponent = CurrentPlacingTower.GetComponent<HeroeTornado>();
                         if (heroComponent != null)
                         {
                             HeroPlaced = true;
                             DisableHeroPlacementButton();
-                            Debug.Log("TowerPlacing: Héroe colocado. Botón desactivado.");
+                            Debug.Log("TowerPlacing: Hï¿½roe colocado. Botï¿½n desactivado.");
                         }
 
-                        // Reactiva el daño y los colliders de daño
+                        // Reactiva el daï¿½o y los colliders de daï¿½o
                         var flameThrower = CurrentPlacingTower.GetComponent<FlameThrowerDamage>();
                         if (flameThrower != null)
                         {
@@ -107,6 +107,11 @@ public class TowerPlacing : MonoBehaviour
         }
     }
 
+    public bool IsPlacingTower()
+    {
+        return CurrentPlacingTower != null;
+    }
+
     public void SetTowerToPlace(GameObject tower)
     {
         // **NUEVO: Deseleccionar torre actual antes de empezar a colocar una nueva**
@@ -115,18 +120,18 @@ public class TowerPlacing : MonoBehaviour
             towerSelection.DeselectTower();
         }
 
-        // Si ya hay una torre en previsualización, elimínala
+        // Si ya hay una torre en previsualizaciï¿½n, elimï¿½nala
         if (CurrentPlacingTower != null)
         {
             Destroy(CurrentPlacingTower);
             CurrentPlacingTower = null;
         }
 
-        // Verificar si es un héroe y si ya se colocó uno
+        // Verificar si es un hï¿½roe y si ya se colocï¿½ uno
         HeroeTornado heroComponent = tower.GetComponent<HeroeTornado>();
         if (heroComponent != null && HeroPlaced)
         {
-            Debug.LogWarning("TowerPlacing: ¡Solo puedes colocar un héroe por partida!");
+            Debug.LogWarning("TowerPlacing: ï¿½Solo puedes colocar un hï¿½roe por partida!");
             return;
         }
 
@@ -136,14 +141,14 @@ public class TowerPlacing : MonoBehaviour
         {
             CurrentPlacingTower = Instantiate(tower, Vector3.zero, Quaternion.identity);
 
-            // Desactiva el daño y los colliders de daño en todos los hijos
+            // Desactiva el daï¿½o y los colliders de daï¿½o en todos los hijos
             var flameThrower = CurrentPlacingTower.GetComponent<FlameThrowerDamage>();
             if (flameThrower != null)
             {
                 flameThrower.enabled = false;
             }
 
-            // Desactiva todos los colliders en hijos que estén en modo trigger (usualmente los de daño)
+            // Desactiva todos los colliders en hijos que estï¿½n en modo trigger (usualmente los de daï¿½o)
             var colliders = CurrentPlacingTower.GetComponentsInChildren<Collider>(true);
             foreach (var col in colliders)
             {
@@ -157,12 +162,12 @@ public class TowerPlacing : MonoBehaviour
         }
     }
 
-    // Método para registrar el botón del héroe (llamado desde el botón o desde código)
+    // Mï¿½todo para registrar el botï¿½n del hï¿½roe (llamado desde el botï¿½n o desde cï¿½digo)
     public static void RegisterHeroButton(Button button)
     {
         heroPlacementButton = button;
 
-        // Si el héroe ya está colocado, desactivar el botón inmediatamente
+        // Si el hï¿½roe ya estï¿½ colocado, desactivar el botï¿½n inmediatamente
         if (HeroPlaced && heroPlacementButton != null)
         {
             heroPlacementButton.interactable = false;
@@ -170,7 +175,7 @@ public class TowerPlacing : MonoBehaviour
         }
     }
 
-    // Desactiva el botón de colocación del héroe
+    // Desactiva el botï¿½n de colocaciï¿½n del hï¿½roe
     private static void DisableHeroPlacementButton()
     {
         if (heroPlacementButton != null)
@@ -180,7 +185,7 @@ public class TowerPlacing : MonoBehaviour
         }
     }
 
-    // Actualiza los visuales del botón (texto, color, etc.)
+    // Actualiza los visuales del botï¿½n (texto, color, etc.)
     private static void UpdateButtonVisuals(Button button, bool isAvailable)
     {
         Text buttonText = button.GetComponentInChildren<Text>();
@@ -188,7 +193,7 @@ public class TowerPlacing : MonoBehaviour
         {
             if (isAvailable)
             {
-                buttonText.text = "Héroe";
+                buttonText.text = "Hï¿½roe";
             }
             else
             {
@@ -196,7 +201,7 @@ public class TowerPlacing : MonoBehaviour
             }
         }
 
-        // Opcional: cambiar el color del botón
+        // Opcional: cambiar el color del botï¿½n
         ColorBlock colors = button.colors;
         if (!isAvailable)
         {
@@ -205,7 +210,7 @@ public class TowerPlacing : MonoBehaviour
         button.colors = colors;
     }
 
-    // Método para resetear el estado (llamar desde GameLoopManager.ResetGame)
+    // Mï¿½todo para resetear el estado (llamar desde GameLoopManager.ResetGame)
     public static void ResetHeroPlacement()
     {
         HeroPlaced = false;
@@ -214,6 +219,6 @@ public class TowerPlacing : MonoBehaviour
             heroPlacementButton.interactable = true;
             UpdateButtonVisuals(heroPlacementButton, true);
         }
-        Debug.Log("TowerPlacing: Estado del héroe reseteado.");
+        Debug.Log("TowerPlacing: Estado del hï¿½roe reseteado.");
     }
 }

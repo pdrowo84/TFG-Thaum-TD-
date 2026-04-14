@@ -5,8 +5,8 @@ public class HeroeTornado : MonoBehaviour
 {
     [Header("Passive Buff")]
     public float BuffRadius = 5f;
-    public float DamageBuff = 1.3f; // multiplicador de daño
-    public ElementDamageType.ElementType RequiredElement = ElementDamageType.ElementType.Wind;
+    public float DamageBuff = 1.3f; // multiplicador de daï¿½o
+    public ElementDamageType.ElementType RequiredElement = ElementDamageType.ElementType.Viento;
 
     [Header("Active Ability")]
     public float AbilityCooldown = 30f;
@@ -45,7 +45,7 @@ public class HeroeTornado : MonoBehaviour
         {
             TornadoSpawnPoint = GameObject.Find("TornadoSpawnPoint");
             if (TornadoSpawnPoint != null) Debug.Log("HeroeTornado: TornadoSpawnPoint encontrado.");
-            else Debug.LogError("HeroeTornado: No se encontró 'TornadoSpawnPoint' en la escena.");
+            else Debug.LogError("HeroeTornado: No se encontrï¿½ 'TornadoSpawnPoint' en la escena.");
         }
 
         GameObject buttonObj = GameObject.Find("TornadoAbilityButton");
@@ -55,7 +55,7 @@ public class HeroeTornado : MonoBehaviour
             if (abilityButton != null)
             {
                 abilityButton.onClick.AddListener(ActivateAbility);
-                Debug.Log("HeroeTornado: Botón encontrado y listener añadido.");
+                Debug.Log("HeroeTornado: Botï¿½n encontrado y listener aï¿½adido.");
             }
         }
 
@@ -167,7 +167,7 @@ public class HeroeTornado : MonoBehaviour
 
         if (TornadoSpawnPoint == null || TornadoPrefab == null)
         {
-            Debug.LogError("HeroeTornado: TornadoSpawnPoint o TornadoPrefab no están asignados!");
+            Debug.LogError("HeroeTornado: TornadoSpawnPoint o TornadoPrefab no estï¿½n asignados!");
             return;
         }
 

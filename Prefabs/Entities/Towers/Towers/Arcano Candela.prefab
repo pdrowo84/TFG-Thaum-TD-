@@ -802,7 +802,7 @@ GameObject:
   - component: {fileID: -1382667932104751689}
   - component: {fileID: 7843392817550557165}
   m_Layer: 3
-  m_Name: FlameThrower
+  m_Name: Arcano Candela
   m_TagString: NoPlace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class EntitySummoner : MonoBehaviour
 {
@@ -29,23 +32,48 @@ public class EntitySummoner : MonoBehaviour
 
     public static void Init()
     {
-        // Si ya est� marcado como inicializado y hay prefabs cargados, no hacer nada.
+        // Si ya está marcado como inicializado y hay prefabs cargados, no hacer nada.
         if (IsInitialized && EnemyPrefabs != null && EnemyPrefabs.Count > 0)
             return;
 
-        // (Re)crea todas las estructuras - esto cubre tanto la primera inicializaci�n
-        // como casos donde la inicializaci�n anterior qued� en estado inconsistente.
+        // (Re)crea todas las estructuras - esto cubre tanto la primera inicialización
+        // como casos donde la inicialización anterior quedó en estado inconsistente.
         EnemyTransformPairs = new Dictionary<Transform, Enemy>();
         EnemyPrefabs = new Dictionary<int, GameObject>();
         EnemyObjectPools = new Dictionary<int, Queue<Enemy>>();
         EnemiesInGame = new List<Enemy>();
         EnemiesIsGameTransform = new List<Transform>();
 
-        EnemySummonData[] Enemies = Resources.LoadAll<EnemySummonData>("Enemies");
+        EnemySummonData[] Enemies = LoadEnemyDataFromResources();
+
+#if UNITY_EDITOR
+        // Fallback para editor: si no están en Resources, buscar todos los EnemySummonData del proyecto.
+        if (Enemies == null || Enemies.Length == 0)
+        {
+            List<EnemySummonData> editorLoaded = new List<EnemySummonData>();
+            string[] guids = AssetDatabase.FindAssets("t:EnemySummonData");
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                EnemySummonData data = AssetDatabase.LoadAssetAtPath<EnemySummonData>(path);
+                if (data != null) editorLoaded.Add(data);
+            }
+            Enemies = editorLoaded.ToArray();
+            Debug.LogWarning($"EntitySummoner.Init: Resources/Enemies vacío. Fallback Editor cargó {Enemies.Length} EnemySummonData desde AssetDatabase.");
+        }
+#endif
+
+        Debug.Log($"EntitySummoner.Init: EnemySummonData cargados totales = {Enemies.Length}");
 
         foreach (EnemySummonData Enemy in Enemies)
         {
             Debug.Log($"Cargando EnemyID: {Enemy.EnemyID}, Prefab: {Enemy.EnemyPrefab}");
+            if (Enemy.EnemyPrefab == null)
+            {
+                Debug.LogWarning($"EntitySummoner.Init: EnemyID {Enemy.EnemyID} tiene prefab NULL, se omite.");
+                continue;
+            }
+
             if (!EnemyPrefabs.ContainsKey(Enemy.EnemyID))
                 EnemyPrefabs.Add(Enemy.EnemyID, Enemy.EnemyPrefab);
 
@@ -54,6 +82,30 @@ public class EntitySummoner : MonoBehaviour
         }
 
         IsInitialized = true;
+    }
+
+    private static EnemySummonData[] LoadEnemyDataFromResources()
+    {
+        // Intentar varias rutas para tolerar cambios de carpeta/nombre.
+        string[] candidatePaths =
+        {
+            "Scriptable Objects/Enemies",
+            "ScriptableObjects/Enemies",
+            "Enemies"
+        };
+
+        for (int i = 0; i < candidatePaths.Length; i++)
+        {
+            EnemySummonData[] loaded = Resources.LoadAll<EnemySummonData>(candidatePaths[i]);
+            if (loaded != null && loaded.Length > 0)
+            {
+                Debug.Log($"EntitySummoner.Init: cargados {loaded.Length} EnemySummonData desde Resources/{candidatePaths[i]}");
+                return loaded;
+            }
+        }
+
+        Debug.LogWarning("EntitySummoner.Init: no se encontraron EnemySummonData en rutas Resources conocidas.");
+        return new EnemySummonData[0];
     }
 
     // Forzar reinicializaci�n (opcional) y opcionalmente destruir objetos en pool
@@ -78,10 +130,22 @@ public class EntitySummoner : MonoBehaviour
 
     public static Enemy SummonEnemy(int EnemyID)
     {
+        // Autorecuperación: si la tabla de prefabs no está lista, intentar inicializar.
+        if (EnemyPrefabs == null || EnemyObjectPools == null)
+            Init();
+
         if (EnemyPrefabs == null || !EnemyPrefabs.ContainsKey(EnemyID))
         {
-            Debug.LogError($"ENTITYSUMMONER: ENEMY WITH ID OF {EnemyID} DOES NOT EXIST OR PREFABS NO EST�N CARGADOS!");
-            return null;
+            // Segundo intento por si la carga quedó inconsistente tras reset/recarga de escena.
+            IsInitialized = false;
+            Init();
+
+            if (EnemyPrefabs == null || !EnemyPrefabs.ContainsKey(EnemyID))
+            {
+                string available = EnemyPrefabs == null ? "none" : string.Join(",", EnemyPrefabs.Keys);
+                Debug.LogError($"ENTITYSUMMONER: ENEMY WITH ID OF {EnemyID} DOES NOT EXIST OR PREFABS NO ESTÁN CARGADOS! IDs disponibles: [{available}]");
+                return null;
+            }
         }
 
         Enemy SummonedEnemy = null;

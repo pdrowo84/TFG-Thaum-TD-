@@ -7,15 +7,15 @@ namespace GameFeel
 {
     /// <summary>
     /// Cut-in estilo Persona: el panel no se desliza, sino que "se abre" escalando
-    /// en altura (Y) o en anchura (X). El pivot del RectTransform define desde dónde crece
+    /// en altura (Y) o en anchura (X). El pivot del RectTransform define desde dï¿½nde crece
     /// (ej. centro 0.5,0.5 = se abre hacia arriba y abajo a la vez).
     /// </summary>
     public class HeroAbilityCutIn : MonoBehaviour
     {
         public enum OpenAxis
         {
-            Vertical,   // escala Y: de casi 0 ? tamaño final
-            Horizontal  // escala X: de casi 0 ? tamaño final
+            Vertical,   // escala Y: de casi 0 ? tamaï¿½o final
+            Horizontal  // escala X: de casi 0 ? tamaï¿½o final
         }
 
         [Header("Apertura (estilo Persona)")]
@@ -29,7 +29,7 @@ namespace GameFeel
         [SerializeField] private float holdDuration = 0.28f;
         [SerializeField] private float exitDuration = 0.16f;
 
-        [Header("Escala mínima (evita 0 exacto en layout)")]
+        [Header("Escala mï¿½nima (evita 0 exacto en layout)")]
         [SerializeField] private float collapsedEpsilon = 0.001f;
 
         [Header("Optional Slash / imagen")]
@@ -42,7 +42,7 @@ namespace GameFeel
         [SerializeField] private float cutInClipVolume = 0.8f;
 
         [Header("Activation hook")]
-        [Tooltip("Coloca aquí la función que activa la habilidad del héroe (p.ej. YourHeroScript.ActivateAbility)")]
+        [Tooltip("Coloca aquï¿½ la funciï¿½n que activa la habilidad del hï¿½roe (p.ej. YourHeroScript.ActivateAbility)")]
         public UnityEvent OnActivate;
 
         private Coroutine routine;
@@ -65,12 +65,12 @@ namespace GameFeel
         }
 
         /// <summary>
-        /// Método público para usar desde un Button.OnClick:
-        /// invoca la lógica de la habilidad (OnActivate) y muestra el cut-in.
+        /// Mï¿½todo pï¿½blico para usar desde un Button.OnClick:
+        /// invoca la lï¿½gica de la habilidad (OnActivate) y muestra el cut-in.
         /// </summary>
         public void ActivateAndPlay()
         {
-            // Ejecutar la lógica de la habilidad (conectada desde el Inspector)
+            // Ejecutar la lï¿½gica de la habilidad (conectada desde el Inspector)
             OnActivate?.Invoke();
 
             // Mostrar el cut-in visual

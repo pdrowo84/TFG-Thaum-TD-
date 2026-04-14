@@ -371,7 +371,7 @@ GameObject:
   - component: {fileID: -6742487694797202782}
   - component: {fileID: 3247717759348455469}
   m_Layer: 3
-  m_Name: Laser
+  m_Name: Arcano Torrente
   m_TagString: NoPlace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

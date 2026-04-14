@@ -4,11 +4,11 @@ public class ElementDamageType : MonoBehaviour
 {
     public enum ElementType
     {
-        None,
-        Fire,
-        Water,
-        Rock,
-        Wind
+        Ninguno,
+        Fuego,
+        Agua,
+        Roca,
+        Viento
        
     }
 }

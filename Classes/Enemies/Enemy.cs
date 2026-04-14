@@ -6,7 +6,7 @@ using static ElementDamageType;
 public class Enemy : MonoBehaviour
 {
     [Header("Enemy Type")]
-    public ElementDamageType.ElementType EnemyElementType = ElementDamageType.ElementType.None;
+    public ElementDamageType.ElementType EnemyElementType = ElementDamageType.ElementType.Ninguno;
 
     public int NodeIndex;
 

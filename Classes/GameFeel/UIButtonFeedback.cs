@@ -8,6 +8,7 @@ namespace GameFeel
     public class UIButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
         [Header("Hover Wobble")]
+        [SerializeField] private bool enableHoverWobble = true;
         [SerializeField] private RectTransform target;
         [SerializeField] private float wobbleDuration = 0.25f;
         [SerializeField] private float wobbleRotationDegrees = 6f;
@@ -15,6 +16,7 @@ namespace GameFeel
         [SerializeField] private float wobbleFrequency = 14f;
 
         [Header("Click Punch")]
+        [SerializeField] private bool enableClickPunch = true;
         [SerializeField] private float clickPunchScale = 1.08f;
         [SerializeField] private float clickPunchDuration = 0.12f;
 
@@ -47,7 +49,8 @@ namespace GameFeel
             CacheBaseIfNeeded();
 
             if (hoverRoutine != null) StopCoroutine(hoverRoutine);
-            hoverRoutine = StartCoroutine(HoverWobble());
+            if (enableHoverWobble)
+                hoverRoutine = StartCoroutine(HoverWobble());
 
             if (audioSource != null && hoverClip != null)
                 audioSource.PlayOneShot(hoverClip, Mathf.Clamp01(hoverClipVolume));
@@ -67,10 +70,21 @@ namespace GameFeel
             CacheBaseIfNeeded();
 
             if (clickRoutine != null) StopCoroutine(clickRoutine);
-            clickRoutine = StartCoroutine(ClickPunch());
+            if (enableClickPunch)
+                clickRoutine = StartCoroutine(ClickPunch());
 
             if (audioSource != null && clickClip != null)
                 audioSource.PlayOneShot(clickClip, Mathf.Clamp01(clickClipVolume));
+        }
+
+        public void SetHoverWobbleEnabled(bool enabled)
+        {
+            enableHoverWobble = enabled;
+        }
+
+        public void SetClickPunchEnabled(bool enabled)
+        {
+            enableClickPunch = enabled;
         }
 
         private void CacheBaseIfNeeded()

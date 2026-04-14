@@ -100,7 +100,7 @@ public class MissileCollisionManager : MonoBehaviour
                     {
                         // SpeedMultiplier = 1 - slowAmount (ej: slowAmount 0.2 => speed * 0.8)
                         float speedMultiplier = Mathf.Clamp01(1f - slowAmount);
-                        Effect slowEffect = new Effect("MissileSlow", 0f, 0f, slowDuration, ElementType.None, speedMultiplier);
+                        Effect slowEffect = new Effect("MissileSlow", 0f, 0f, slowDuration, ElementType.Ninguno, speedMultiplier);
                         GameLoopManager.EnqueueEffectToApply(new ApplyEffectData(EnemyToDamage, slowEffect));
                     }
                 }

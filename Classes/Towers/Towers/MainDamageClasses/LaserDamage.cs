@@ -36,7 +36,7 @@ public class LaserDamage : MonoBehaviour, IDamageMethod
             Vector3 targetPos = Target.RootPart != null ? Target.RootPart.position : Target.transform.position;
 
             var tower = GetComponent<TowerBehaviour>();
-            ElementType damageType = tower != null ? tower.DamageElement : ElementType.None;
+            ElementType damageType = tower != null ? tower.DamageElement : ElementType.Ninguno;
             float towerDamage = tower != null ? tower.Damage : Damage;
             float penetration = tower != null ? tower.ArmorPenetration : 0f;
             int bounceCount = tower != null ? tower.LaserBounceCount : 0;
