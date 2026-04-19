@@ -13,13 +13,7 @@ MonoBehaviour:
   m_Name: 001WaveData
   m_EditorClassIdentifier: 
   EnemiesToSpawn:
-  - EnemyID: 2
-    Count: 10
   - EnemyID: 1
-    Count: 10
-  - EnemyID: 3
-    Count: 10
-  - EnemyID: 4
     Count: 10
   SpawnInterval: 1
   Mode: 1
