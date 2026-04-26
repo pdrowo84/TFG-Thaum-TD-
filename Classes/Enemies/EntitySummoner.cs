@@ -193,9 +193,12 @@ public class EntitySummoner : MonoBehaviour
             if (!EnemyTransformPairs.ContainsKey(SummonedEnemy.transform)) EnemyTransformPairs.Add(SummonedEnemy.transform, SummonedEnemy);
 
             SummonedEnemy.ID = EnemyID;
+            TutorialManager.Instance?.OnEnemySpawned(EnemyID);
         }
 
         return SummonedEnemy;
+
+        
     }
 
     public static void RemoveEnemy(Enemy EnemyToRemove)

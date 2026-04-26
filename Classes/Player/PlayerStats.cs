@@ -49,6 +49,7 @@ public class PlayerStats : MonoBehaviour
     {
         CurrentMoney += MoneyToAdd;
         MoneyDisplayText.SetText($"  {CurrentMoney}");
+        TutorialManager.Instance?.OnMoneyChanged(CurrentMoney);
     }
 
     public int GetMoney()

@@ -277,6 +277,7 @@ public class GameLoopManager : MonoBehaviour
     {
         if (currentWave < Waves.Count)
         {
+            TutorialManager.Instance?.OnWaveStarted(currentWave);
             StartCoroutine(SpawnWave(Waves[currentWave]));
             currentWave++;
         }

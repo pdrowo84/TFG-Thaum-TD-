@@ -354,6 +354,7 @@ public class TowerUpgradeUI : MonoBehaviour
         // Cobrar y aplicar
         playerStats.AddMoney(-upgrade.Cost);
         currentTower.ApplyUpgrade(upgrade);
+        TutorialManager.Instance?.OnTowerUpgraded();
 
         // Refrescar UI principal y de upgrades
         var uiManager = FindObjectOfType<TowerUIManager>();

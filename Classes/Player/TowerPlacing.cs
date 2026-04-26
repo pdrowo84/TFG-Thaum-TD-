@@ -93,13 +93,8 @@ public class TowerPlacing : MonoBehaviour
                         }
 
                         TowerCollider.isTrigger = false;
-
-                        // **NUEVO: Deseleccionar cualquier torre antes de limpiar la referencia**
-                        if (towerSelection != null)
-                        {
-                            towerSelection.DeselectTower();
-                        }
-
+                        if (towerSelection != null) { towerSelection.DeselectTower(); }
+                        TutorialManager.Instance?.OnTowerPlaced();    // Llamada a la funci�n OnTowerPlaced del TutorialManager
                         CurrentPlacingTower = null;
                     }
                 }
