@@ -104,7 +104,9 @@ public class TowerBehaviour : MonoBehaviour
         if (Target != null)
         {
             Vector3 targetPos = Target.RootPart != null ? Target.RootPart.position : Target.transform.position;
-            TowerPivot.transform.rotation = Quaternion.LookRotation(targetPos - TowerPivot.position);
+            Vector3 direccion = targetPos - TowerPivot.position;
+            direccion.y = 0;
+            TowerPivot.transform.rotation = Quaternion.LookRotation(direccion);
         }
     }
 

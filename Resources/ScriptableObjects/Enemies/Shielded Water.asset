@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: Shielded Water
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: e8e1009faf9bf9643bcba716f8403825, type: 3}
+  EnemyPrefab: {fileID: 8188170794586487179, guid: 17951596fcdc192478242f55f043bdd3, type: 3}
   EnemyID: 6

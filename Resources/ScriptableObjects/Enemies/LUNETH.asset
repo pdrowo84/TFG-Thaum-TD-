@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: LUNETH
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: ddfddc6c4422b3e419993b3a64cd685c, type: 3}
+  EnemyPrefab: {fileID: 1052449267587062170, guid: 61a7cec2ff84da943a88d24b5f5828ab, type: 3}
   EnemyID: 14

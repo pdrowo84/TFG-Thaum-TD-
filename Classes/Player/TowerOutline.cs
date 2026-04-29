@@ -64,6 +64,7 @@ public class TowerOutline : MonoBehaviour
             outlineObj.transform.localRotation = Quaternion.identity;
             outlineObj.transform.localScale = Vector3.one * (1f + width);
 
+
             outlineObj.layer = ignoreLayer;
             SetLayerRecursively(outlineObj, ignoreLayer);
 

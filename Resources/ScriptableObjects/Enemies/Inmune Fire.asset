@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: Inmune Fire
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: 0742264088d98df428f282a7a238cf76, type: 3}
+  EnemyPrefab: {fileID: 3146589245680714385, guid: 9c4ead36a0b6d5e4dba0778ea37f8d7e, type: 3}
   EnemyID: 12

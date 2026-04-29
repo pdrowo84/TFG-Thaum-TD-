@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: Inmune Water
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: ce131272c73e1f243ba9647519306098, type: 3}
+  EnemyPrefab: {fileID: 2565088347957208158, guid: 79e61f6647940fd4ba192c9e24b570ba, type: 3}
   EnemyID: 10

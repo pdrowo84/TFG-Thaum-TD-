@@ -16,6 +16,10 @@ public class TutorialManager : MonoBehaviour
     [Header("Referencias")]
     public TutorialDialogueUI DialogueUI;
 
+    [Header("Botones de torres (para desactivar durante tutorial)")]
+    public UnityEngine.UI.Button[] ArcanoButtons; // Asigna todos los botones EXCEPTO Zéfiro
+    public UnityEngine.UI.Button ZefiroButton;
+
     // ─── Estado interno ──────────────────────────────────────────────
     private int currentStep = 0;
     private bool waitingForAction = false;
@@ -90,7 +94,9 @@ public class TutorialManager : MonoBehaviour
         switch (targetStep)
         {
             case TutorialStep.Intro:
-                GameLoopManager.PauseGame();   // <-- pausa
+                GameLoopManager.PauseGame();
+                SetArcanoButtonsInteractable(false);  // bloquea los demás
+                if (ZefiroButton != null) ZefiroButton.interactable = false;  // bloquea Zéfiro también
                 DialogueUI.Show(
                     "¡Eh! Soy Thatha. Los acólitos avanzan hacia nuestras defensas y tú eres quien las organiza. ¡Manos a la obra!",
                     onContinue: () => ShowStep(TutorialStep.PlaceWindTower)
@@ -100,6 +106,8 @@ public class TutorialManager : MonoBehaviour
             case TutorialStep.PlaceWindTower:
                 GameLoopManager.ResumeGame();
                 waitingForAction = true;
+                if (ZefiroButton != null) ZefiroButton.interactable = true;  // solo activa Zéfiro
+                                                                             // ArcanoButtons siguen desactivados
                 DialogueUI.Show(
                     "Selecciona el Arcano Zéfiro del panel y haz clic en el terreno para colocarlo.",
                     onContinue: null
@@ -131,22 +139,21 @@ public class TutorialManager : MonoBehaviour
 
             case TutorialStep.SolkarIntro:
                 DialogueUI.Show(
-                    "¡Eso es Solkar! Es un boss. Tiene inmunidad al Fuego, así que el Arcano Brasas no le afectará. " +
-                    "Usa Viento o Tierra. Y cuidado con su estela...",
+                    "¿¡Y AHORA SOLKAR!?.Ten mucho cuidado con este coloso, tengo entendido que RESISTE MUCHO el Viento y el Fuego. ¿Primero Luneth y ahora él? Esto tiene mala pinta...",
                     onContinue: () => GameLoopManager.ResumeGame()
                 );
                 break;
 
             case TutorialStep.LunethIntro:
                 DialogueUI.Show(
-                    "Y ahora Luneth. Inmunidad al Agua, el Arcano Mareal es inútil contra él. " +
-                    "Coordina bien tus Arcanos, ¡esto es lo último!",
+                    "¿¡Lu-LUNETH!?.No tengo tiempo para explicaciones,solo ten en cuenta que es MUY RESISTENTE a los elementos. " +
+                    "Agua y Roca. Qué hara aquí?...",
                     onContinue: () => GameLoopManager.ResumeGame()
                 );
                 break;
         }
     }
-        
+
 
     // ─── Hooks llamados desde otros scripts ──────────────────────────
 
@@ -160,7 +167,8 @@ public class TutorialManager : MonoBehaviour
         if (step == TutorialStep.PlaceWindTower && waitingForAction)
         {
             waitingForAction = false;
-            ShowStep(TutorialStep.ExplainLives); // antes iba a ExplainUpgrade
+            SetArcanoButtonsInteractable(true); // <- añade esto
+            ShowStep(TutorialStep.ExplainLives);
         }
     }
 
@@ -188,8 +196,24 @@ public class TutorialManager : MonoBehaviour
     /// </summary>
     public void OnWaveStarted(int waveNumber)
     {
-        
-        
+        if (!tutorialActive) return;
+
+        if (waveNumber == 9)  // oleada 10 en pantalla
+        {
+            GameLoopManager.PauseGame();
+            DialogueUI.Show(
+                "Parece que los enemigos se han apaciguado... pero lo noto. A partir de ahora, esto se va a poner mucho más difícil.",
+                onContinue: () => GameLoopManager.ResumeGame()
+            );
+        }
+        else if (waveNumber == 19)  // oleada 20 en pantalla
+        {
+            GameLoopManager.PauseGame();
+            DialogueUI.Show(
+                "¡Por mis cuernos! ¡Nadie me había avisado de que habría eclipse hoy!",
+                onContinue: () => GameLoopManager.ResumeGame()
+            );
+        }
     }
 
     /// <summary>
@@ -234,24 +258,23 @@ public class TutorialManager : MonoBehaviour
 
             case ID_FUGAZ:
                 return "¿Ves esos que van disparados? Son los Fugaces. Rápidos como el rayo y difíciles de enfocar. " +
-                       "Una torre de Viento bien colocada puede ralentizarlos, pero no te confíes.";
+                       "A menos que dispares más rapido de lo que ellos se mueven...";
 
             case ID_CASCARON:
                 return "Mira esas cosas grandes y lentas que se acercan. Son los Cascarones. " +
-                       "Tienen mucha armadura, así que necesitarás daño sostenido para bajarlos. " +
-                       "El Arcano Pétreo hace bien su trabajo con ellos.";
+                       "Tienen mucha armadura, asi que prueba a penetrarla o a ralentizarlos.";
 
             case ID_MOTA:
                 return "¡Wow, wow! ¿Ves esas cositas tan rápidas y pequeñas de ahí? Les llamamos Motas. " +
-                       "Son enanas pero van en grupos y se hacen bola. Si se te cuelan unas pocas, te hacen daño de verdad.";
+                       "Son enanas pero van en grupos y se hacen bola. Prueba con algo que tenga un gran área de efecto.";
 
             case ID_VELADO:
-                return "Hmm... ¿notas algo raro? Los Velados tienen una resistencia especial al daño elemental. " +
-                       "Prueba a combinar tipos de torres para encontrar su punto débil.";
+                return "Hmm... ¿notas algo raro? Los Velados tienen una resistencia especial ciertos elementos. " +
+                       "Prueba a combinar tipos de torres, a ver a cuales les cuesta menos.";
 
             case ID_IMPURO:
-                return "Esos de ahí son los Impuros. Lo que los hace peligrosos es que te dañan más las defensas " +
-                       "si consiguen llegar al final. Prioriza eliminarlos antes que a los demás.";
+                return "Esos de ahí son los Impuros. Lo que los hace peligrosos es que son inmunes a ciertos " +
+                       "elementos. Es imperativo que combines arcanos de distintos elementos.";
 
             case ID_SOLKAR:
             case ID_LUNETH:
@@ -302,5 +325,12 @@ public class TutorialManager : MonoBehaviour
             upgradeHintGiven = true;
             ShowStep(TutorialStep.Wave2Upgrades);
         }
+    }
+
+    private void SetArcanoButtonsInteractable(bool value)
+    {
+        if (ArcanoButtons == null) return;
+        foreach (var btn in ArcanoButtons)
+            if (btn != null) btn.interactable = value;
     }
 }

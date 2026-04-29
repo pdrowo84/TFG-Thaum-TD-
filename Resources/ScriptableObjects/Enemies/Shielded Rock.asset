@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: Shielded Rock
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: 9129856ed2cfb9845b1fe934ee278fc8, type: 3}
+  EnemyPrefab: {fileID: 5006825613540716469, guid: 2570f135be76dcf45adf504c41f41ec8, type: 3}
   EnemyID: 7

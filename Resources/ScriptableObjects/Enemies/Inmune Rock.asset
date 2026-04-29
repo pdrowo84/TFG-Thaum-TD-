@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: Inmune Rock
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: f073931ea9ca5d94d8dda8aee069a442, type: 3}
+  EnemyPrefab: {fileID: 233547542853469639, guid: b608c2bf5f65045448d3c631cd7f959f, type: 3}
   EnemyID: 11

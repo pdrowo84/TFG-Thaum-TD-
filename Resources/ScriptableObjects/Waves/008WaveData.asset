@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EnemiesToSpawn:
   - EnemyID: 5
-    Count: 15
+    Count: 8
   - EnemyID: 4
     Count: 20
   SpawnInterval: 1

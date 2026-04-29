@@ -26,7 +26,11 @@ public class FireTriggerManager : MonoBehaviour
 
             float burnDuration = tower.FlameBurnDuration;
             Effect FlameEffect = new Effect("Fire", BaseClass.FireRate, BaseClass.Damage, burnDuration, damageType);
-            ApplyEffectData EffectData = new ApplyEffectData(EntitySummoner.EnemyTransformPairs[other.transform.parent], FlameEffect);
+            Transform enemyTransform = EntitySummoner.EnemyTransformPairs.ContainsKey(other.transform)
+                ? other.transform
+                : other.transform.parent;
+
+            ApplyEffectData EffectData = new ApplyEffectData(EntitySummoner.EnemyTransformPairs[enemyTransform], FlameEffect);
             GameLoopManager.EnqueueEffectToApply(EffectData);
         }
     }

@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: SOLKAR
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: 1e6327b98fd54cf4b9bd9f7a48c8296a, type: 3}
+  EnemyPrefab: {fileID: 4749682058814176407, guid: d40f81fe538f8b140bf539b4f0b0a1d8, type: 3}
   EnemyID: 13

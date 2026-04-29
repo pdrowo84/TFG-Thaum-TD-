@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: Runner
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: 1d39c8197f5a28148ba0eb22a532a8db, type: 3}
+  EnemyPrefab: {fileID: 8256131076154329532, guid: 989ac3a40067cb5409966e5b6f67f09c, type: 3}
   EnemyID: 2

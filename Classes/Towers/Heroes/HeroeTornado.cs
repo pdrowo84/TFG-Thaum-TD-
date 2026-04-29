@@ -14,6 +14,7 @@ public class HeroeTornado : MonoBehaviour
     public GameObject TornadoSpawnPoint;
     public float TornadoDuration = 5f;
     public float TornadoDamageMultiplier = 3f;
+    public Vector3 TornadoSpawnOffset = new Vector3(0f, 5f, 0f);
 
     [Header("GameFeel (Cut-in)")]
     [SerializeField] private GameFeel.HeroAbilityCutIn abilityCutIn;
@@ -171,8 +172,8 @@ public class HeroeTornado : MonoBehaviour
             return;
         }
 
-        Vector3 spawnPos = TornadoSpawnPoint.transform.position;
-        GameObject tornado = Instantiate(TornadoPrefab, spawnPos, Quaternion.identity);
+        Vector3 spawnPos = TornadoSpawnPoint.transform.position + 2.5f * Vector3.up;
+        GameObject tornado = Instantiate(TornadoPrefab, spawnPos, Quaternion.Euler(-70f, 0f, 10f));
         activeTornado = tornado;
 
         if (tornado.transform.localScale == Vector3.zero) tornado.transform.localScale = Vector3.one * 2f;

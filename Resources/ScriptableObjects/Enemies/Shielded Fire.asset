@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: Shielded Fire
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: c0c2e841d5fd6e64a9e2185aefc0aca8, type: 3}
+  EnemyPrefab: {fileID: 1357118356359837527, guid: b11aaed9b7de771459d9c810e205d6b3, type: 3}
   EnemyID: 8

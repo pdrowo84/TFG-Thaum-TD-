@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Cadencia ++\n200 <sprite index=0> \n\n"
+  m_text: "Pen. Armadura++\n200 <sprite index=0> \n\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 98da76073b8bd894cbe8e6ac8e4db38a, type: 2}
   m_sharedMaterial: {fileID: 7551980604815489391, guid: 98da76073b8bd894cbe8e6ac8e4db38a, type: 2}
@@ -92,11 +92,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 21
+  m_fontSize: 16.89
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 21
+  m_fontSizeMin: 16.89
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2

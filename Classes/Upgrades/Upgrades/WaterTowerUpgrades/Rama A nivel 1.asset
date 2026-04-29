@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 863ee3012714568468e33ae00e412601, type: 3}
   m_Name: Rama A nivel 1
   m_EditorClassIdentifier: 
-  UpgradeName: Armor Pen. +
+  UpgradeName: Pen. Armadura +
   Description: 
   Icon: {fileID: 0}
   Cost: 125

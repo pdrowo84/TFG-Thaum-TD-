@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: Inmune Wind
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: 41afded31868d674790ed1d6fbc28695, type: 3}
+  EnemyPrefab: {fileID: 6467083418551313949, guid: 06c1fac24aac9f246b9745db98fbde9c, type: 3}
   EnemyID: 9

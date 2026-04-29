@@ -88,17 +88,21 @@ public class MissileCollisionManager : MonoBehaviour
             {
                 ElementType damageType = GetComponentInParent<TowerBehaviour>().DamageElement;
 
-                Enemy EnemyToDamage = EntitySummoner.EnemyTransformPairs[EnemiesInRadius[i].transform.parent];
-                if (!EnemyToDamage.IsDead)
+                Transform enemyTransform = EnemiesInRadius[i].transform;
+
+                Enemy EnemyToDamage = null;
+                if (EntitySummoner.EnemyTransformPairs.ContainsKey(enemyTransform))
+                    EnemyToDamage = EntitySummoner.EnemyTransformPairs[enemyTransform];
+                else if (enemyTransform.parent != null && EntitySummoner.EnemyTransformPairs.ContainsKey(enemyTransform.parent))
+                    EnemyToDamage = EntitySummoner.EnemyTransformPairs[enemyTransform.parent];
+
+                if (EnemyToDamage != null && !EnemyToDamage.IsDead)
                 {
-                    // Encolar daño
                     EnemyDamageData DamageToApply = new EnemyDamageData(EnemyToDamage, BaseClass.Damage, EnemyToDamage.DamageResistance, damageType);
                     GameLoopManager.EnqueueDamageData(DamageToApply);
 
-                    // Encolar efecto de ralentización si aplica
                     if (slowAmount > 0f && slowDuration > 0f)
                     {
-                        // SpeedMultiplier = 1 - slowAmount (ej: slowAmount 0.2 => speed * 0.8)
                         float speedMultiplier = Mathf.Clamp01(1f - slowAmount);
                         Effect slowEffect = new Effect("MissileSlow", 0f, 0f, slowDuration, ElementType.Ninguno, speedMultiplier);
                         GameLoopManager.EnqueueEffectToApply(new ApplyEffectData(EnemyToDamage, slowEffect));

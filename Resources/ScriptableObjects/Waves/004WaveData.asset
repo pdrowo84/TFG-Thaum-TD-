@@ -18,4 +18,4 @@ MonoBehaviour:
   - EnemyID: 3
     Count: 2
   SpawnInterval: 1
-  Mode: 0
+  Mode: 1

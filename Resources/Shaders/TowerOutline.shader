@@ -3,8 +3,8 @@ Shader "Game/TowerOutline"
     Properties
     {
         _BaseColor("Outline Color", Color) = (1, 0.5, 0, 1)
+        _OutlineWidth("Outline Width", Float) = 0.03
     }
-
     SubShader
     {
         Tags
@@ -13,27 +13,24 @@ Shader "Game/TowerOutline"
             "RenderPipeline" = "UniversalPipeline"
             "Queue" = "Geometry+10"
         }
-
         Pass
         {
             Name "TowerOutlinePass"
             Tags { "LightMode" = "UniversalForwardOnly" }
-
             Cull Front
             ZWrite Off
             ZTest LEqual
-            Blend One Zero
 
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 2.0
-
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
+                float3 normalOS   : NORMAL;
             };
 
             struct Varyings
@@ -42,13 +39,15 @@ Shader "Game/TowerOutline"
             };
 
             CBUFFER_START(UnityPerMaterial)
-                half4 _BaseColor;
+                half4  _BaseColor;
+                float  _OutlineWidth;
             CBUFFER_END
 
             Varyings vert(Attributes input)
             {
                 Varyings output;
-                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+                float3 expanded = input.positionOS.xyz + input.normalOS * _OutlineWidth;
+                output.positionCS = TransformObjectToHClip(expanded);
                 return output;
             }
 
@@ -59,6 +58,5 @@ Shader "Game/TowerOutline"
             ENDHLSL
         }
     }
-
     FallBack Off
 }

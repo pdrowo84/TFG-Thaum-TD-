@@ -31,15 +31,15 @@ public class MissileDamage : MonoBehaviour, IDamageMethod
                 return;
             }
 
-            MissileSystem.transform.rotation = GetComponent<TowerBehaviour>().TowerPivot.rotation;
-            MissileSystemMain.startRotationX = TowerHead.forward.x;
-            MissileSystemMain.startRotationY = TowerHead.forward.y;
-            MissileSystemMain.startRotationZ = TowerHead.forward.z;
+            // Apuntar directamente al enemigo en los 3 ejes
+            Vector3 targetPos = Target.RootPart != null ? Target.RootPart.position : Target.transform.position;
+            Vector3 direccion = (targetPos - TowerHead.position).normalized;
+            if (direccion != Vector3.zero)
+                MissileSystem.transform.rotation = Quaternion.LookRotation(direccion);
 
             MissileSystem.Play();
             Delay = 1f / FireRate;
         }
-
     }
 
 }

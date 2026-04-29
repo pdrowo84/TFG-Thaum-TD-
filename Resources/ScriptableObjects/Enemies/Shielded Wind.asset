@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89fafd8d633e54145b6dc135e821d992, type: 3}
   m_Name: Shielded Wind
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 2854087141035409545, guid: a7992e76925d6c24794cbcb095c7d6f5, type: 3}
+  EnemyPrefab: {fileID: 3834470509200662123, guid: cc13d39d8a82d7e4f91b93a8f522d34f, type: 3}
   EnemyID: 5
