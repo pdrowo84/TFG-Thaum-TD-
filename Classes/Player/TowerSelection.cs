@@ -9,7 +9,7 @@ public class TowerSelection : MonoBehaviour
     public LayerMask TowerLayer; // Layer de las torres (configura "Tower" layer)
     public Color OutlineColor = Color.black;
     [Range(0.01f, 0.3f)]
-    public float OutlineWidth = 0.05f; // Grosor del outline (5% m�s grande)
+    public float OutlineWidth = 0.05f; // Grosor del outline (5% mas grande)
 
     private Camera mainCamera;
     private TowerBehaviour selectedTower;
@@ -53,7 +53,7 @@ public class TowerSelection : MonoBehaviour
 
     private void TrySelectTower()
     {
-        // Mientras se est� previsualizando/colocando una torre, no permitir selecci�n de torres colocadas.
+        // Mientras se esta previsualizando/colocando una torre, no permitir seleccion de torres colocadas.
         if (towerPlacing != null && towerPlacing.IsPlacingTower())
             return;
 
@@ -66,7 +66,7 @@ public class TowerSelection : MonoBehaviour
 
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-        // Usamos RaycastAll y seleccionamos el primer collider v�lido (por distancia).
+        // Usamos RaycastAll y seleccionamos el primer collider valido (por distancia).
         RaycastHit[] hits = Physics.RaycastAll(ray, 1000f);
         if (hits == null || hits.Length == 0)
         {
@@ -131,7 +131,7 @@ public class TowerSelection : MonoBehaviour
 
         selectedTower = tower;
 
-        // A�adir outline visual (el color se actualizar� desde TowerUIManager)
+        // A�adir outline visual (el color se actualizara desde TowerUIManager)
         currentOutline = tower.gameObject.GetComponent<TowerOutline>();
         if (currentOutline == null)
         {
@@ -139,7 +139,7 @@ public class TowerSelection : MonoBehaviour
         }
         currentOutline.EnableOutline(OutlineColor, OutlineWidth);
 
-        // Notificar al UI Manager (esto actualizar� el color del outline)
+        // Notificar al UI Manager (esto actualizara el color del outline)
         if (uiManager != null)
         {
             uiManager.ShowTowerInfo(tower);

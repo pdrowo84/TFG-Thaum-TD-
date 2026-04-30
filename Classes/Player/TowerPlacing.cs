@@ -12,7 +12,7 @@ public class TowerPlacing : MonoBehaviour
 
     private GameObject CurrentPlacingTower;
 
-    // Tracking de h�roes colocados
+    // Tracking de heroes colocados
     public static bool HeroPlaced = false;
     private static Button heroPlacementButton;
 
@@ -21,7 +21,7 @@ public class TowerPlacing : MonoBehaviour
 
     void Start()
     {
-        // Resetear el estado del h�roe al iniciar (por si viene de un reset)
+        // Resetear el estado del heroe al iniciar (por si viene de un reset)
         HeroPlaced = false;
         heroPlacementButton = null;
 
@@ -70,7 +70,7 @@ public class TowerPlacing : MonoBehaviour
 
                         PlayerStatisctics.AddMoney(-CurrentToweBehaviour.SummonCost);
 
-                        // Verificar si es un h�roe y marcar como colocado
+                        // Verificar si es un heroe y marcar como colocado
                         HeroeTornado heroComponent = CurrentPlacingTower.GetComponent<HeroeTornado>();
                         if (heroComponent != null)
                         {
@@ -79,7 +79,7 @@ public class TowerPlacing : MonoBehaviour
                             Debug.Log("TowerPlacing: H�roe colocado. Bot�n desactivado.");
                         }
 
-                        // Reactiva el da�o y los colliders de da�o
+                        // Reactiva el daño y los colliders de daño
                         var flameThrower = CurrentPlacingTower.GetComponent<FlameThrowerDamage>();
                         if (flameThrower != null)
                         {
@@ -94,7 +94,7 @@ public class TowerPlacing : MonoBehaviour
 
                         TowerCollider.isTrigger = false;
                         if (towerSelection != null) { towerSelection.DeselectTower(); }
-                        TutorialManager.Instance?.OnTowerPlaced();    // Llamada a la funci�n OnTowerPlaced del TutorialManager
+                        TutorialManager.Instance?.OnTowerPlaced();    // Llamada a la funcion OnTowerPlaced del TutorialManager
                         CurrentPlacingTower = null;
                     }
                 }
@@ -109,20 +109,20 @@ public class TowerPlacing : MonoBehaviour
 
     public void SetTowerToPlace(GameObject tower)
     {
-        // **NUEVO: Deseleccionar torre actual antes de empezar a colocar una nueva**
+        
         if (towerSelection != null)
         {
             towerSelection.DeselectTower();
         }
 
-        // Si ya hay una torre en previsualizaci�n, elim�nala
+        // Si ya hay una torre en previsualizacion, elim�nala
         if (CurrentPlacingTower != null)
         {
             Destroy(CurrentPlacingTower);
             CurrentPlacingTower = null;
         }
 
-        // Verificar si es un h�roe y si ya se coloc� uno
+        // Verificar si es un heroe y si ya se coloc� uno
         HeroeTornado heroComponent = tower.GetComponent<HeroeTornado>();
         if (heroComponent != null && HeroPlaced)
         {
@@ -136,14 +136,14 @@ public class TowerPlacing : MonoBehaviour
         {
             CurrentPlacingTower = Instantiate(tower, Vector3.zero, Quaternion.identity);
 
-            // Desactiva el da�o y los colliders de da�o en todos los hijos
+            // Desactiva el daño y los colliders de daño en todos los hijos
             var flameThrower = CurrentPlacingTower.GetComponent<FlameThrowerDamage>();
             if (flameThrower != null)
             {
                 flameThrower.enabled = false;
             }
 
-            // Desactiva todos los colliders en hijos que est�n en modo trigger (usualmente los de da�o)
+            // Desactiva todos los colliders en hijos que estan en modo trigger (usualmente los de da�o)
             var colliders = CurrentPlacingTower.GetComponentsInChildren<Collider>(true);
             foreach (var col in colliders)
             {
@@ -157,12 +157,12 @@ public class TowerPlacing : MonoBehaviour
         }
     }
 
-    // M�todo para registrar el bot�n del h�roe (llamado desde el bot�n o desde c�digo)
+    // Metodo para registrar el bot�n del h�roe (llamado desde el boton o desde codigo)
     public static void RegisterHeroButton(Button button)
     {
         heroPlacementButton = button;
 
-        // Si el h�roe ya est� colocado, desactivar el bot�n inmediatamente
+        // Si el heroe ya esta colocado, desactivar el boton inmediatamente
         if (HeroPlaced && heroPlacementButton != null)
         {
             heroPlacementButton.interactable = false;
@@ -170,7 +170,7 @@ public class TowerPlacing : MonoBehaviour
         }
     }
 
-    // Desactiva el bot�n de colocaci�n del h�roe
+    // Desactiva el boton de colocaci�n del heroe
     private static void DisableHeroPlacementButton()
     {
         if (heroPlacementButton != null)
@@ -180,7 +180,7 @@ public class TowerPlacing : MonoBehaviour
         }
     }
 
-    // Actualiza los visuales del bot�n (texto, color, etc.)
+    // Actualiza los visuales del boton (texto, color, etc.)
     private static void UpdateButtonVisuals(Button button, bool isAvailable)
     {
         Text buttonText = button.GetComponentInChildren<Text>();
@@ -196,7 +196,7 @@ public class TowerPlacing : MonoBehaviour
             }
         }
 
-        // Opcional: cambiar el color del bot�n
+        // Opcional: cambiar el color del boton
         ColorBlock colors = button.colors;
         if (!isAvailable)
         {
@@ -205,7 +205,7 @@ public class TowerPlacing : MonoBehaviour
         button.colors = colors;
     }
 
-    // M�todo para resetear el estado (llamar desde GameLoopManager.ResetGame)
+    // Metodo para resetear el estado (llamar desde GameLoopManager.ResetGame)
     public static void ResetHeroPlacement()
     {
         HeroPlaced = false;

@@ -110,7 +110,7 @@ MonoBehaviour:
   EnemyElementType: 0
   NodeIndex: 0
   RootPart: {fileID: 8779903624417268486}
-  DamageResistance: 1
+  DamageResistance: 0.9
   MaxHealth: 56
   Health: 0
   Speed: 4

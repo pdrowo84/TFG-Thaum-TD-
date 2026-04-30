@@ -46,6 +46,9 @@ public class GameLoopManager : MonoBehaviour
     [Tooltip("Velocidad angular en grados/seg que usan los enemigos para rotar hacia su direcci�n de movimiento")]
     public float EnemyRotationSpeed = 720f;
 
+    [Header("Feedback")]
+    [SerializeField] private GameFeel.DamageFeedback damageFeedback;
+
     private void Start()
     {
         EntitySummoner.Init();
@@ -89,7 +92,7 @@ public class GameLoopManager : MonoBehaviour
     }
     private void Update()
     {
-        // Si ya se mostr� la victoria, no arrancar m�s oleadas
+        // Si ya se mostró la victoria, no arrancar más oleadas
         if (victoryShown) return;
 
         // Si no hay oleada en curso y no quedan enemigos vivos, lanza la siguiente oleada
@@ -156,6 +159,13 @@ public class GameLoopManager : MonoBehaviour
 
                 if (EntitySummoner.EnemiesInGame[i].NodeIndex >= NodePositions.Length)
                 {
+                    // Activar screen shake cuando un enemigo llega al final
+                    if (damageFeedback != null)
+                    {
+                        damageFeedback.Play();
+                        Debug.Log($"Screen shake activado por enemigo {EntitySummoner.EnemiesInGame[i].name} al llegar al final");
+                    }
+
                     if (PlayerStatistics != null)
                     {
                         int lifeDamage = EntitySummoner.EnemiesInGame[i].LifeDamage;
@@ -242,7 +252,7 @@ public class GameLoopManager : MonoBehaviour
                     if (CurrentDamageData.DamageElement != ElementType.Ninguno)
                         multiplier = CurrentDamageData.TargetedEnemy.GetElementalMultiplier(CurrentDamageData.DamageElement);
 
-                    // Aplica el da�o con el multiplicador elemental y la penetraci�n
+                    // Aplica el daño con el multiplicador elemental y la penetración
                     float effectiveResistance = Mathf.Max(0.1f, CurrentDamageData.Resistance * (1f - CurrentDamageData.Penetration));
                     CurrentDamageData.TargetedEnemy.Health -= (CurrentDamageData.TotalDamage * multiplier) / effectiveResistance;
 
@@ -306,14 +316,14 @@ public class GameLoopManager : MonoBehaviour
             GameplayUIPanel.SetActive(false);
     }
 
-    // Bot�n UI: jugar de nuevo (reinicia escena/estado)
+    // Botón UI: jugar de nuevo (reinicia escena/estado)
     public void VictoryPlayAgain()
     {
         // ResetGame normaliza timeScale y recarga escena
         ResetGame();
     }
 
-    // Bot�n UI: salir del juego
+    // Botón UI: salir del juego
     public void VictoryQuit()
     {
         Debug.Log("Saliendo del juego (victoria)");
@@ -348,7 +358,7 @@ public class GameLoopManager : MonoBehaviour
                 break;
 
             case WaveData.SpawnMode.Interleaved:
-                // Round-robin: spawnea 1 de cada entrada por iteraci�n hasta agotar todas
+                // Round-robin: spawnea 1 de cada entrada por iteración hasta agotar todas
                 int entries = wave.EnemiesToSpawn.Length;
                 int[] remaining = new int[entries];
                 for (int e = 0; e < entries; e++) remaining[e] = Mathf.Max(0, wave.EnemiesToSpawn[e].Count);
@@ -486,8 +496,8 @@ public class GameLoopManager : MonoBehaviour
     {
         DesiredTimeScale = isFast ? 2f : 1f;
 
-        // Si el juego est� pausado (o en un panel que pausa), no tocar el timescale actual.
-        // Al reanudar, ResumeGame aplicar� DesiredTimeScale.
+        // Si el juego está pausado (o en un panel que pausa), no tocar el timescale actual.
+        // Al reanudar, ResumeGame aplicará DesiredTimeScale.
         if (!IsPaused)
             Time.timeScale = DesiredTimeScale;
     }
@@ -507,7 +517,7 @@ public class GameLoopManager : MonoBehaviour
         int total = Waves.Count;
 
         // Cuando no ha empezado ninguna ola currentWave == 0 y waveInProgress == false -> mostrar 0/total
-        // Cuando est� en progreso o despu�s de iniciar una ola, currentWave contiene el n�mero de la ola en curso (1-based)
+        // Cuando está en progreso o despu�s de iniciar una ola, currentWave contiene el n�mero de la ola en curso (1-based)
         int displayWave = Mathf.Clamp(currentWave, 0, total);
 
         // Si no hay oleadas configuradas, mostrar 0/0 por seguridad
@@ -520,7 +530,7 @@ public class GameLoopManager : MonoBehaviour
 
 public class Effect
 {
-    // A�adido SpeedMultiplier para soporte de ralentizaciones (1 = sin cambio, 0.8 = 20% m�s lento)
+    // A�adido SpeedMultiplier para soporte de ralentizaciones (1 = sin cambio, 0.8 = 20% más lento)
     public Effect(string effectName, float damageRate, float damage, float expireTime, ElementType damageElement, float speedMultiplier = 1f)
     {
 
@@ -586,7 +596,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
 
     public float DeltaTime;
 
-    // Nueva: velocidad angular (grados/seg) para rotaci�n suave hacia la direcci�n de movimiento
+    // Nueva: velocidad angular (grados/seg) para rotaci�n suave hacia la dirección de movimiento
     public float RotationSpeed;
 
     public void Execute(int index, TransformAccess transform)
@@ -597,7 +607,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
         Vector3 PositionToMove = NodePositions[NodeIndex[index]];
         Vector3 currentPos = transform.position;
 
-        // Direcci�n hacia el objetivo
+        // Dirección hacia el objetivo
         Vector3 dir = PositionToMove - currentPos;
         float distToTarget = dir.magnitude;
 
@@ -614,7 +624,7 @@ public struct MoveEnemyJob : IJobParallelForTransform
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, RotationSpeed * DeltaTime);
         }
 
-        // Si hemos alcanzado la posici�n objetivo, avanzamos al siguiente nodo
+        // Si hemos alcanzado la posición objetivo, avanzamos al siguiente nodo
         if (newPos == PositionToMove)
         {
             NodeIndex[index]++;

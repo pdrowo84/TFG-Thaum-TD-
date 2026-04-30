@@ -50,8 +50,8 @@ public class Enemy : MonoBehaviour
         // Restaurar velocidad/estado base cuando se (re)inicializa desde pool
         Speed = BaseSpeed;
 
-        // No resetear IsSlowImmune aqu�: en la primera instancia Init() corre despu�s de OnEnable
-        // y borrar�a la inmunidad de bosses (p. ej. SolkarAbility). Queda en false por defecto;
+        // No resetear IsSlowImmune aquí: en la primera instancia Init() corre después de OnEnable
+        // y borraría la inmunidad de bosses (p. ej. SolkarAbility). Queda en false por defecto;
         // SolkarAbility lo pone en OnEnable tras activar; OnDisable al enpoolar lo limpia.
     }
 

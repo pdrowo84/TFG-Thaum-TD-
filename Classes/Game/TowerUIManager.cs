@@ -19,10 +19,10 @@ public class TowerUIManager : MonoBehaviour
     public TowerUpgradeUI UpgradeUI;
 
     public TMP_Dropdown TargetingDropdown;
-    public TMP_Dropdown ElementFilterDropdown; // **NUEVO: Dropdown de filtro por elemento**
+    public TMP_Dropdown ElementFilterDropdown; 
     public GameObject UpgradePanel;
     public Button SellButton;
-    public TextMeshProUGUI SellButtonText; // Texto del bot�n de venta (muestra el valor)
+    public TextMeshProUGUI SellButtonText; // Texto del boton de venta (muestra el valor)
 
     [Header("Price Icon (opcional) - TextMeshPro Sprite Asset")]
     [Tooltip("Sprite asset de TextMeshPro que contiene el icono de moneda (crear con 'Create -> TextMeshPro -> Sprite Asset').")]
@@ -81,7 +81,7 @@ public class TowerUIManager : MonoBehaviour
     [Header("Sell Settings")]
     [Tooltip("Mostrar confirmaci�n antes de vender")]
     public bool ShowSellConfirmation = true;
-    public GameObject SellConfirmationPanel; // Panel de confirmaci�n (opcional)
+    public GameObject SellConfirmationPanel; // Panel de confirmacion (opcional)
     public TextMeshProUGUI SellConfirmationText; // Texto de confirmaci�n
 
     private TowerBehaviour currentTower;
@@ -120,7 +120,7 @@ public class TowerUIManager : MonoBehaviour
             TowerInfoPanel.SetActive(false);
         }
 
-        // Ocultar panel de confirmaci�n
+        // Ocultar panel de confirmacion
         if (SellConfirmationPanel != null)
         {
             SellConfirmationPanel.SetActive(false);
@@ -138,7 +138,7 @@ public class TowerUIManager : MonoBehaviour
             PanelBackgroundImage = TowerInfoPanel.GetComponent<Image>();
         }
 
-        // Configurar bot�n de venta
+        // Configurar boton de venta
         if (SellButton != null)
         {
             SellButton.onClick.AddListener(OnSellButtonClicked);
@@ -150,7 +150,7 @@ public class TowerUIManager : MonoBehaviour
             PopulateTargetingDropdown();
         }
 
-        // Legacy: ocultar Image icons si est�n asignados (usaremos TMP sprite inline si se asigna)
+        // Legacy: ocultar Image icons si estan asignados (usaremos TMP sprite inline si se asigna)
         if (SellButtonPriceIcon != null)
         {
             SellButtonPriceIcon.gameObject.SetActive(false);
@@ -161,7 +161,7 @@ public class TowerUIManager : MonoBehaviour
         }
     }
 
-    // peque�os helpers para Start() claridad
+    // pequeños helpers para Start() claridad
     private void tower_selection_init() => towerSelection = FindObjectOfType<TowerSelection>();
     private void player_stats_init() => playerStats = FindObjectOfType<PlayerStats>();
 
@@ -207,7 +207,7 @@ public class TowerUIManager : MonoBehaviour
         TargetingDropdown.AddOptions(options);
     }
 
-    // (Se muestra �nicamente la parte modificada: ShowTowerInfo + nueva coroutine)
+    // (Se muestra unicamente la parte modificada: ShowTowerInfo + nueva coroutine)
     public void ShowTowerInfo(TowerBehaviour tower)
     {
         if (TowerInfoPanel == null) return;
@@ -311,7 +311,7 @@ public class TowerUIManager : MonoBehaviour
     {
         if (TargetingDropdown == null) return;
 
-        // Convertir el enum a �ndice del dropdown
+        // Convertir el enum a índice del dropdown
         int dropdownIndex = (int)tower.TargetingMode;
         TargetingDropdown.SetValueWithoutNotify(dropdownIndex);
     }
@@ -354,7 +354,7 @@ public class TowerUIManager : MonoBehaviour
 
         int sellValue = currentTower.GetSellValue();
 
-        // Mostrar panel de confirmaci�n
+        // Mostrar panel de confirmacion
         SellConfirmationPanel.SetActive(true);
 
         if (SellConfirmationText != null)
@@ -378,7 +378,7 @@ public class TowerUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Confirmar venta (llamado desde el bot�n "S�" del panel de confirmaci�n)
+    /// Confirmar venta (llamado desde el boton "Sí" del panel de confirmacion)
     /// </summary>
     public void ConfirmSell()
     {
@@ -391,7 +391,7 @@ public class TowerUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Cancelar venta (llamado desde el bot�n "No" del panel de confirmaci�n)
+    /// Cancelar venta (llamado desde el boton "No" del panel de confirmacion)
     /// </summary>
     public void CancelSell()
     {
@@ -437,7 +437,7 @@ public class TowerUIManager : MonoBehaviour
         Debug.Log("TowerUIManager: Torre destruida.");
     }
 
-    // peque�a ayuda para evitar warnings por referencia nula en el dif
+    // pequeña ayuda para evitar warnings por referencia nula en el dif
     private bool tower_selection_is_not_null() => towerSelection != null;
 
     public void HideTowerInfo()
@@ -507,7 +507,7 @@ public class TowerUIManager : MonoBehaviour
         }
     }
 
-    // M�todos para Fase 3 y 4 (implementaremos despu�s)
+    
     /// <summary>
     /// Callback cuando se cambia el dropdown de targeting
     /// </summary>

@@ -14,8 +14,8 @@ namespace GameFeel
     {
         public enum OpenAxis
         {
-            Vertical,   // escala Y: de casi 0 ? tama�o final
-            Horizontal  // escala X: de casi 0 ? tama�o final
+            Vertical,   
+            Horizontal  
         }
 
         [Header("Apertura (estilo Persona)")]
@@ -65,12 +65,12 @@ namespace GameFeel
         }
 
         /// <summary>
-        /// M�todo p�blico para usar desde un Button.OnClick:
-        /// invoca la l�gica de la habilidad (OnActivate) y muestra el cut-in.
+        /// M�todo publico para usar desde un Button.OnClick:
+        /// invoca la logica de la habilidad (OnActivate) y muestra el cut-in.
         /// </summary>
         public void ActivateAndPlay()
         {
-            // Ejecutar la l�gica de la habilidad (conectada desde el Inspector)
+            // Ejecutar la logica de la habilidad (conectada desde el Inspector)
             OnActivate?.Invoke();
 
             // Mostrar el cut-in visual
